@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
-orquestrador-4b — Orquestrador dedicado ao Qwen3-4B (2.4GB).
+orquestrador-4b -- Orquestrador dedicado ao Qwen3-4B (2.4GB).
 Worker leve. Pipeline: stress → battery → creative → temp_sweep → sweep → ppl → analyze.
 Resultados em ~/build/test-4b/
 """

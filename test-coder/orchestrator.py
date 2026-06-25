@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
 orquestrador-coder - Orquestrador dedicado ao qwen2.5-coder (4.7GB).
 Worker pesado. Pipeline: stress > battery > creative > temp_sweep > sweep > ppl > analyze.

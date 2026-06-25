@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
-bench_analyze.py v2 — RCA + Pareto (child do orquestrador).
+bench_analyze.py v2 -- RCA + Pareto (child do orquestrador).
 Executa benchmark com métricas de sistema e gera diagnóstico 3W.
 Usa llama-server recompilado. Output JSON via stdout.
 """

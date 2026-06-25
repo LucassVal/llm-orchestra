@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
-bench_sweep.py — Otimizador de parâmetros para LLMs locais.
+bench_sweep.py -- Otimizador de parâmetros para LLMs locais.
 Lê sweep_config.json, testa combinações, encontra ótimo.
 Uso: python3 bench_sweep.py test-4b/sweep_config.json
 """

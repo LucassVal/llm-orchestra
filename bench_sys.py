@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
-bench_sys.py — Métricas de sistema por run (RCA/Pareto).
-Captura: CPU clock, temp, RAM, swap, carga — antes/durante/depois.
+bench_sys.py -- Métricas de sistema por run (RCA/Pareto).
+Captura: CPU clock, temp, RAM, swap, carga -- antes/durante/depois.
 """
 import os
 import time

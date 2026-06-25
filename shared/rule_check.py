@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=verificador regras R-BENCH | WHY=garantir governanca | WHEN='make rules'
 """
-rule_check.py — Verificador de TODAS as regras R-BENCH-*.
+rule_check.py -- Verificador de TODAS as regras R-BENCH-*.
 Todas ERR (bloqueantes), exceto RAM e Thermal (orquestrador gerencia).
 """
 import json
@@ -17,7 +19,7 @@ def _run(cmd, **kw):
 
 
 def check_ram():
-    """RAM (WARN — orquestrador gerencia)"""
+    """RAM (WARN -- orquestrador gerencia)"""
     r = _run(["free", "-m"])
     for line in r.stdout.split("\n"):
         if "Mem:" in line:
@@ -30,7 +32,7 @@ def check_ram():
 
 
 def check_ollama():
-    """ollama list — 3 modelos (ERR)"""
+    """ollama list -- 3 modelos (ERR)"""
     r = _run(["ollama", "list"])
     count = len([line for line in r.stdout.split("\n") if line.strip()]) - 1
     if count < 3:
@@ -47,7 +49,7 @@ def check_daemon():
 
 
 def check_thermal():
-    """Thermal (WARN — orquestrador gerencia)"""
+    """Thermal (WARN -- orquestrador gerencia)"""
     tf = BUILD / "shared" / "thermal_status.json"
     if tf.exists():
         try:

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
-bench_battery.py v2 — Bateria de testes práticos (child do orquestrador).
+bench_battery.py v2 -- Bateria de testes práticos (child do orquestrador).
 Cobre: código, lógica, tradução, instrução.
 Usa llama-server recompilado. Output JSON via stdout.
 """

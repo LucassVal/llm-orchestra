@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
 orquestrador-gemma - Orquestrador dedicado ao gemma4:e4b (8.9GB).
 Orquestrador principal (maior). Pipeline: stress > battery > creative > temp_sweep > sweep > ppl > analyze.

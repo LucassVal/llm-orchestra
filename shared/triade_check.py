@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""triade_check.py — Verifica espelhamento Makefile <-> maker CLI <-> .ps1."""
+
+# 3W: WHAT=espelhamento triade | WHY=garantir make/maker/ps1 sync | WHEN='make audit'
+"""triade_check.py -- Verifica espelhamento Makefile <-> maker CLI <-> .ps1."""
 import re
 import sys
 from pathlib import Path
@@ -51,13 +53,13 @@ def run():
     missing_ps1 = ps1_required - ps1
 
     if missing_maker or missing_ps1:
-        print("TRIADE CHECK — FAIL")
+        print("TRIADE CHECK -- FAIL")
         if missing_maker:
             print("  maker ausente: " + ",".join(sorted(missing_maker)))
         if missing_ps1:
             print("  ps1 ausente: " + ",".join(sorted(missing_ps1)))
         return 1
-    print("TRIADE CHECK — PASS (maker={} ps1={} espelhados)".format(
+    print("TRIADE CHECK -- PASS (maker={} ps1={} espelhados)".format(
         len(maker_required), len(ps1_required)))
     return 0
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=gate pre-commit | WHY=bloquear codigo ruim | WHEN=git commit
 """
-pre_commit_hook.py — Gate obrigatorio pre-commit.
+pre_commit_hook.py -- Gate obrigatorio pre-commit.
 Roda compliance audit + stub scan + lazy pattern detection.
 ERR = bloqueia commit. User deve explicitamente aprovar bypass.
 
@@ -78,7 +80,7 @@ def scan_stubs():
 
 
 def run_slop():
-    """Roda aislop — detector de AI slop (padroes de agentes)."""
+    """Roda aislop -- detector de AI slop (padroes de agentes)."""
     r = subprocess.run(
         ["aislop", str(BUILD), "--ignore", "llama.cpp", "--exit-zero"],
         capture_output=True, text=True,
@@ -88,7 +90,7 @@ def run_slop():
 
 
 def run_mock_tests():
-    """Roda pytest com mock — testes unitarios."""
+    """Roda pytest com mock -- testes unitarios."""
     r = subprocess.run(
         ["pytest", str(BUILD/"tests"), "-q", "--tb=short"],
         capture_output=True, text=True,
@@ -98,7 +100,7 @@ def run_mock_tests():
 
 
 def run_rules():
-    """Roda rule_check.py — todas regras R-BENCH-*."""
+    """Roda rule_check.py -- todas regras R-BENCH-*."""
     r = subprocess.run(
         [sys.executable, str(BUILD/"shared"/"rule_check.py")],
         capture_output=True, text=True,
@@ -124,14 +126,14 @@ def main():
 
     # ── COMPLIANCE (visao geral do sistema) ──
     print("=" * 70)
-    print("  COMPLIANCE AUDIT — Visao Geral do Sistema")
+    print("  COMPLIANCE AUDIT -- Visao Geral do Sistema")
     print("=" * 70)
     print(audit_out)
 
     # ── Rules ──
     if not rules_ok:
         print("=" * 70)
-        print("  RULE CHECK (R-BENCH-*) — FAIL")
+        print("  RULE CHECK (R-BENCH-*) -- FAIL")
         print("=" * 70)
         print(rules_out)
         print("=" * 70)
@@ -142,7 +144,7 @@ def main():
     # ── AI Slop ──
     if not slop_ok:
         print("=" * 70)
-        print("  AI SLOP DETECTOR (aislop) — {} achados".format(slop_issues))
+        print("  AI SLOP DETECTOR (aislop) -- {} achados".format(slop_issues))
         print("=" * 70)
         for line in slop_out.strip().split("\n")[:20]:
             if line.strip():
@@ -153,7 +155,7 @@ def main():
     # ── Mock Tests ──
     if not mock_ok:
         print("=" * 70)
-        print("  MOCK TESTS (pytest) — FAIL")
+        print("  MOCK TESTS (pytest) -- FAIL")
         print("=" * 70)
         for line in mock_out.strip().split("\n")[:10]:
             if line.strip():
@@ -166,10 +168,10 @@ def main():
     # ── Stub scan ──
     if findings:
         print("=" * 70)
-        print("  STUB/LAZY/BYPASS SCAN — {} achados".format(len(findings)))
+        print("  STUB/LAZY/BYPASS SCAN -- {} achados".format(len(findings)))
         print("=" * 70)
         for f in findings:
-            print("  [{}] {}:{} — {}".format(
+            print("  [{}] {}:{} -- {}".format(
                 f["category"], f["file"], f["line"], f["pattern"]))
             print("         {}".format(f["code"]))
         print("=" * 70)

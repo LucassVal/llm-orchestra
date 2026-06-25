@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
-agent_factory.py — Fabrica de agentes via contrato JSON.
+agent_factory.py -- Fabrica de agentes via contrato JSON.
 Le um agent_contract.json e gera/valida o agente.
 SDD: agent_contract_template.json como spec canonica.
 
@@ -87,7 +89,7 @@ def create_agent(contract_path, output_dir=None):
     limits = c["4_limits"]
 
     md = []
-    md.append("# {} — {}".format(c["display_name"], agent_id))
+    md.append("# {} -- {}".format(c["display_name"], agent_id))
     md.append("")
     md.append("## Identidade")
     md.append("- **Modelo:** {}".format(c["1_profile"]["model"]))
@@ -138,8 +140,8 @@ def create_agent(contract_path, output_dir=None):
     shutil.copy(contract_path, out / "contract.json")
 
     print("✓ Agente criado: {}".format(out))
-    print("  AGENT.md    — identidade e regras")
-    print("  contract.json — contrato canonico")
+    print("  AGENT.md    -- identidade e regras")
+    print("  contract.json -- contrato canonico")
     return True
 
 
@@ -151,9 +153,9 @@ def list_profiles():
         for prof in sorted(model_dir.glob("*.json")):
             try:
                 p = json.loads(prof.read_text())
-                print("  {} — {}".format(prof.stem, p.get("description", "?")))
+                print("  {} -- {}".format(prof.stem, p.get("description", "?")))
             except Exception:
-                print("  {} — JSON invalido".format(prof.stem))
+                print("  {} -- JSON invalido".format(prof.stem))
 
 
 if __name__ == "__main__":

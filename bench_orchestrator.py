@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
-bench_orchestrator.py v4 — Orquestrador unificado DDD.
+bench_orchestrator.py v4 -- Orquestrador unificado DDD.
 Coordena múltiplos modelos, pre-flight + benchmark completo.
 
 Fases:
@@ -65,7 +67,7 @@ MODELS = [
                "", 2.4),                                                                                 # worker leve
 ]
 
-# Qwen3-4B é GGUF solto — sem Ollama
+# Qwen3-4B é GGUF solto -- sem Ollama
 MODELS[-1]._gguf_path = os.path.expanduser("~/build/Qwen_Qwen3-4B-Q4_K_M.gguf")
 
 # ═══════════════════════════════════════════════════════════════════
@@ -158,7 +160,7 @@ def blob_path(blob_hash: str) -> str:
 
 
 def get_gguf_path(m: ModelEntry) -> str:
-    """Retorna caminho GGUF — blob Ollama ou arquivo solto."""
+    """Retorna caminho GGUF -- blob Ollama ou arquivo solto."""
     if hasattr(m, '_gguf_path') and m._gguf_path:
         return m._gguf_path
     return blob_path(m.blob_hash)
@@ -233,7 +235,7 @@ def cleanup_after_model(model_name: str = ""):
         pass
 
 # ═══════════════════════════════════════════════════════════════════
-# SERVER MANAGER — Orquestrador é DONO do ciclo de vida do servidor
+# SERVER MANAGER -- Orquestrador é DONO do ciclo de vida do servidor
 # ═══════════════════════════════════════════════════════════════════
 
 DEFAULT_SERVER_BIN = os.path.expanduser("~/llama.cpp/build/bin/llama-server")
@@ -274,7 +276,7 @@ class ServerManager:
             time.sleep(1)
             try:
                 urllib.request.urlopen(f"{self.url}/health", timeout=2)
-                tee(f"  [SERVER] ONLINE em {i+1}s — {self.url}")
+                tee(f"  [SERVER] ONLINE em {i+1}s -- {self.url}")
                 return self.url
             except Exception:
                 pass
@@ -295,7 +297,7 @@ class ServerManager:
         time.sleep(0.5)
 
 # ═══════════════════════════════════════════════════════════════════
-# RAM GUARD — integrado ao orquestrador
+# RAM GUARD -- integrado ao orquestrador
 # ═══════════════════════════════════════════════════════════════════
 
 def free_ram_mb() -> int:
@@ -327,7 +329,7 @@ def check_ram_gate(ram_avail_mb: int, swap_used_pct: float, model_name: str) -> 
     return True
 
 # ═══════════════════════════════════════════════════════════════════
-# PROCESS REGISTRY + DECAY — Harness com shutdown preventivo
+# PROCESS REGISTRY + DECAY -- Harness com shutdown preventivo
 # ═══════════════════════════════════════════════════════════════════
 
 class ProcessRegistry:
@@ -528,7 +530,7 @@ def preflight_llamaserver(gguf: str) -> tuple:
             subprocess.run(["fuser", "-k", "8080/tcp"], capture_output=True, timeout=2)
 
 # ═══════════════════════════════════════════════════════════════════
-# APPLICATION — Orchestrator
+# APPLICATION -- Orchestrator
 # ═══════════════════════════════════════════════════════════════════
 
 def run_bench_child(name: str, gguf: str, methods: list, reasoning: str,
@@ -586,7 +588,7 @@ def run_bench_child(name: str, gguf: str, methods: list, reasoning: str,
 def print_preflight_table(pf_list: list):
     print()
     print("=" * 65)
-    print("  PRE-FLIGHT: Hello World — 2 métodos")
+    print("  PRE-FLIGHT: Hello World -- 2 métodos")
     print("=" * 65)
     print(f"  {'MODELO':<20} {'LLAMA-CLI':<15} {'LLAMA-SRV':<15} {'GB':<5} {'RISCO':<6}")
     print(f"  {'-'*61}")
@@ -605,7 +607,7 @@ def print_preflight_table(pf_list: list):
 def print_bench_table(all_results: list):
     print()
     print("=" * 105)
-    print("  RESULTADO FINAL — BENCHMARK UNIFICADO")
+    print("  RESULTADO FINAL -- BENCHMARK UNIFICADO")
     print("=" * 105)
     print(f"  {'MODELO':<18} {'METODO':<12} {'R':<5} {'CAT':<12} {'STATUS':<8} {'t(s)':<7} {'tok/s':<7} {'RESPOSTA'}")
     print(f"  {'-'*101}")
@@ -637,7 +639,7 @@ def print_bench_table(all_results: list):
 def generate_markdown(all_results: list, run_id: str) -> str:
     """Gera relatório markdown completo."""
     lines = [
-        "# Benchmark LLM — Resultados",
+        "# Benchmark LLM -- Resultados",
         f"**Run ID:** `{run_id}`",
         f"**Data:** {datetime.now().strftime('%Y-%m-%d %H:%M')}",
         "**Dispositivo:** Moto Signature 16GB RAM",
@@ -750,7 +752,7 @@ def main():
 
     if args.ppl_only:
         # ═══ MODO PPL-ONLY ═══
-        tee(f"FASE ÚNICA: PERPLEXIDADE (PPL) — {len(models)} modelos")
+        tee(f"FASE ÚNICA: PERPLEXIDADE (PPL) -- {len(models)} modelos")
         ppl_results = []
         for i, m in enumerate(models):
             gguf = get_gguf_path(m)
@@ -791,7 +793,7 @@ def main():
         # Tabela PPL
         print()
         print("=" * 55)
-        print("  PERPLEXIDADE (PPL) — Quanto menor, melhor")
+        print("  PERPLEXIDADE (PPL) -- Quanto menor, melhor")
         print("=" * 55)
         print(f"  {'MODELO':<20} {'PPL':<8} {'TOKENS':<8} {'FRASES':<10}")
         print(f"  {'-'*46}")
@@ -802,7 +804,7 @@ def main():
         tee("PPL CONCLUIDO.")
         return
 
-    # ═══ MODO PIPELINE — esteira completa: todos os testes ═══
+    # ═══ MODO PIPELINE -- esteira completa: todos os testes ═══
     if args.pipeline:
         import threading
 
@@ -957,7 +959,7 @@ def main():
         
         # Tabela final do pipeline
         print("\n" + "=" * 125)
-        print("  PIPELINE COMPLETO — RESULTADOS")
+        print("  PIPELINE COMPLETO -- RESULTADOS")
         print("=" * 125)
         print("  {:<22} {:>8} {:>8} {:>9} {:>10} {:>7} {:>7} {:>9} {:>7}".format(
             "MODELO", "STRESS", "BATTERY", "CREATIVE", "T_SWEEP", "SWEEP", "PPL", "ANALYZE", "ΔRAM"))
@@ -992,7 +994,7 @@ def main():
         from bench_sys import SysMonitor
         
         models.sort(key=lambda m: m.size_gb)
-        tee(f"STRESS TEST — {len(models)} modelos (menor → maior)")
+        tee(f"STRESS TEST -- {len(models)} modelos (menor → maior)")
         tee(f"LOG: {LOG_FILE}")
         
         monitor = SysMonitor()
@@ -1097,14 +1099,14 @@ def main():
             ram_delta = ram_post["used_mb"] - ram_pre["used_mb"]
             tee(f"  [SYS] Pós-modelo RAM: {ram_post['used_mb']}MB (delta: {ram_delta:+d}MB) | "
                 f"Swap: {swap_post['used_mb']}MB | Thermal: {thermal_post}°C")
-            tee(f"◀ FIM: {m.name} — OK")
+            tee(f"◀ FIM: {m.name} -- OK")
             
             # ═══ CLEANUP: libera RAM para o próximo modelo ═══
             cleanup_after_model(m.name)
         
         # ═══ TABELA FINAL ═══
         print(f"\n{'='*95}")
-        print("  COMPARATIVO FINAL — STRESS TEST (orquestrador v4)")
+        print("  COMPARATIVO FINAL -- STRESS TEST (orquestrador v4)")
         print(f"{'='*95}")
         print(f"  {'MODELO':<20} {'GB':<5} {'COLD':>8} {'SUST':>8} {'STRESS':>8} {'T_MAX':>6} {'STATUS':<15}")
         print(f"  {'-'*80}")
@@ -1132,11 +1134,11 @@ def main():
         tee("STRESS TEST CONCLUIDO.")
         return
 
-    # ═══ BENCHMARK DIRETO (sem preflight — mmap resolve) ═══
+    # ═══ BENCHMARK DIRETO (sem preflight -- mmap resolve) ═══
     questions = "B1,L1,C1" if args.quick else args.questions
     reasoning = args.reasoning
 
-    tee(f"BENCHMARK ({questions}, reasoning={reasoning}) — {len(models)} modelos")
+    tee(f"BENCHMARK ({questions}, reasoning={reasoning}) -- {len(models)} modelos")
     all_results = []
 
     for i, m in enumerate(models):

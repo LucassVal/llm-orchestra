@@ -125,6 +125,9 @@ agent-validate: ## Valida contrato de agente (CONTRACT=~/agents/meu_agente.json)
 agent-profiles: ## Lista perfis disponiveis por LLM
 	@cd $(BUILD) && python3 shared/agent_factory.py list-profiles
 
+multi: ## Orquestrador multi-agente (list/run/pipeline)
+	@cd $(BUILD) && python3 shared/multi_agent.py $(ARGS)
+
 daemon-start: ## Inicia metrics_daemon (via meta)
 	@cd $(BUILD) && python3 meta_orchestrator.py --daemon start
 

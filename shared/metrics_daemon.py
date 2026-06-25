@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
-metrics_daemon.py — Coletor persistente de metricas a cada 5s.
+metrics_daemon.py -- Coletor persistente de metricas a cada 5s.
 Fontes: thermal_governor (celular) + cada orquestrador (LLM).
 Entrega: Obsidian vault (status atual) + CSV historico por modelo.
-Sem LLM — script puro, leve, via no_agent cron ou background.
+Sem LLM -- script puro, leve, via no_agent cron ou background.
 
 Arquivos gerados:
-  vault/metricas/llm_status.md       — status atual (sobrescrito)
-  vault/metricas/history_4b.csv      — historico do worker 4B
-  vault/metricas/history_coder.csv   — historico do coder
-  vault/metricas/history_gemma.csv   — historico do gemma
-  vault/metricas/history_phone.csv   — historico do celular
+  vault/metricas/llm_status.md       -- status atual (sobrescrito)
+  vault/metricas/history_4b.csv      -- historico do worker 4B
+  vault/metricas/history_coder.csv   -- historico do coder
+  vault/metricas/history_gemma.csv   -- historico do gemma
+  vault/metricas/history_phone.csv   -- historico do celular
 """
 import csv
 import sys
@@ -25,7 +27,7 @@ VAULT.mkdir(parents=True, exist_ok=True)
 
 
 def collect_all():
-    """Coleta via meta — mesma funcao que --report usa."""
+    """Coleta via meta -- mesma funcao que --report usa."""
     from metrics_reporter import collect_metrics
     m = collect_metrics()
 
@@ -113,7 +115,7 @@ def write_status_md(phone, models):
     md.append("updated: {}".format(p["ts"]))
     md.append("---")
     md.append("")
-    md.append("# 📡 LLM Status — {}".format(now))
+    md.append("# 📡 LLM Status -- {}".format(now))
     md.append("")
     md.append("## 📱 Celular")
     md.append("| Métrica | Valor |")

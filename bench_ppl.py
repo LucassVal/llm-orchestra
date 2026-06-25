@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
-bench_ppl.py — Mede perplexidade (PPL) de modelos locais.
+bench_ppl.py -- Mede perplexidade (PPL) de modelos locais.
 Usa llama-server com logprobs em corpus pt-BR.
 
 PPL = exp(-1/N * sum(log P(token_i | contexto)))
-Quanto menor, melhor — modelo "menos surpreso" pelo texto.
+Quanto menor, melhor -- modelo "menos surpreso" pelo texto.
 
 Regras: R-TRACE, R-NO-SILENT-FAIL, R-KISS.
 """

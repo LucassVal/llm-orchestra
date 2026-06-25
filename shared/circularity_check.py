@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=detector ciclos | WHY=evitar imports circulares | WHEN='make deps'
 """
-circularity_check.py — Detecta dependencias ciclicas entre modulos Python.
+circularity_check.py -- Detecta dependencias ciclicas entre modulos Python.
 Varre imports e constroi grafo. Ciclo = FAIL bloqueante.
 """
 import ast
@@ -77,14 +79,14 @@ def run():
     cycles = find_cycles(graph)
 
     if cycles:
-        print("CIRCULARITY CHECK — FAIL")
+        print("CIRCULARITY CHECK -- FAIL")
         for c in cycles:
             print("  ciclo: " + " → ".join(c))
         return 1
     else:
         mods = len(graph)
         edges = sum(len(v) for v in graph.values())
-        print("CIRCULARITY CHECK — PASS ({} modulos, {} arestas, 0 ciclos)".format(mods, edges))
+        print("CIRCULARITY CHECK -- PASS ({} modulos, {} arestas, 0 ciclos)".format(mods, edges))
         return 0
 
 

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
-thermal_governor.py — Governador termico + RAM para inferencia local.
+thermal_governor.py -- Governador termico + RAM para inferencia local.
 Como um processador: monitora a cada 5s e ajusta parametros em tempo real.
-Nunca bloqueia — sempre degrada gracefulmente.
+Nunca bloqueia -- sempre degrada gracefulmente.
 
 Politicas:
   temp < 70°C → full power (max_tokens=512, temp=0.7)

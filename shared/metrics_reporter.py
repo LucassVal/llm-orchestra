@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
-metrics_reporter.py — Agregador de metricas em tempo real.
+metrics_reporter.py -- Agregador de metricas em tempo real.
 Le: thermal_status.json + bench_status.json + test-*/results.json
 Entrega: Obsidian vault (markdown) + stdout (para bot/gateway).
 
 Fontes:
-  1. shared/thermal_status.json — governador termico (5s pings)
-  2. bench_status.json           — progresso do pipeline (5s pings)
-  3. test-*/results.json         — resultados completos (pos-pipeline)
+  1. shared/thermal_status.json -- governador termico (5s pings)
+  2. bench_status.json           -- progresso do pipeline (5s pings)
+  3. test-*/results.json         -- resultados completos (pos-pipeline)
 
 Modos:
   python3 shared/metrics_reporter.py                → stdout (bot)
@@ -165,7 +167,7 @@ def format_obsidian(m):
     md.append("updated: {}".format(m["timestamp"]))
     md.append("---")
     md.append("")
-    md.append("# 🔴 LLM Status — {}".format(now))
+    md.append("# 🔴 LLM Status -- {}".format(now))
     md.append("")
     md.append("## 🌡 Termico")
     md.append("- **Temp:** {:.0f}°C  {}  (tier: `{}`, max_tok: {})".format(
@@ -177,7 +179,7 @@ def format_obsidian(m):
         pct = p["step_n"] / p["step_total"] * 100 if p["step_total"] else 0
         md.append("## ⚙ Pipeline")
         md.append("- **Fase:** {} | modelo: {}".format(p["phase"], p["model"]))
-        md.append("- **Etapa:** {} ({}/{}) — {}%".format(p["step"], p["step_n"], p["step_total"], int(pct)))
+        md.append("- **Etapa:** {} ({}/{}) -- {}%".format(p["step"], p["step_n"], p["step_total"], int(pct)))
         md.append("- **Elapsed:** {}s ({:.0f}min)".format(p["elapsed_s"], p["elapsed_s"] / 60))
         md.append("")
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
-bench_temp_sweep.py v1 — Varredura de temperatura para LLMs locais.
+bench_temp_sweep.py v1 -- Varredura de temperatura para LLMs locais.
 Testa N temperaturas com prompts de código, lógica, criatividade e factualidade.
 Mede: tok/s, diversidade lexical, repetição, factualidade, qualidade de código.
 Usa llama-server (deve estar rodando). Output: JSON + log via stderr.

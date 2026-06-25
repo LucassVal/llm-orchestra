@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=validador Python nativo | WHY=substituir mypy no Termux | WHEN='make lint'
 """
-py_check.py — Validador Python nativo (substitui mypy no Android/Termux).
-Usa ast.parse() — builtin, zero dependencias, funciona em qqr Python.
+py_check.py -- Validador Python nativo (substitui mypy no Android/Termux).
+Usa ast.parse() -- builtin, zero dependencias, funciona em qqr Python.
 Verifica: syntax error, import cycles (basico), dead code indicators.
 """
 import ast
@@ -44,12 +46,12 @@ def run():
             errors.append((str(py_file.relative_to(BUILD)), err))
 
     if errors:
-        print("PY CHECK — FAIL ({}/{})".format(ok, total))
+        print("PY CHECK -- FAIL ({}/{})".format(ok, total))
         for fname, err in errors:
             print("  {}: {}".format(fname, err))
         return 1
 
-    print("PY CHECK — PASS ({}/{} arquivos validos)".format(ok, total))
+    print("PY CHECK -- PASS ({}/{} arquivos validos)".format(ok, total))
     return 0
 
 

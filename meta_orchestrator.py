@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=hub orquestracao | WHY=unificar comandos LLMs | WHEN=sempre
 """
 META-ORQUESTRADOR v3 - Roteador + motor de agente com travas mecanicas.
 Modos:
@@ -105,7 +107,7 @@ def run_all():
 
     try:
         print("=" * 60)
-        print("  META-ORQUESTRADOR v2 — 3 LLMs")
+        print("  META-ORQUESTRADOR v2 -- 3 LLMs")
         print("  4B > coder > gemma")
         print("  Status em tempo real: bench_status.json")
         print("=" * 60)
@@ -123,7 +125,7 @@ def run_all():
                 results[name] = {"status": "MISSING"}
                 continue
 
-            print("> {} — {}".format(name.upper(), datetime.now().strftime('%H:%M:%S')))
+            print("> {} -- {}".format(name.upper(), datetime.now().strftime('%H:%M:%S')))
             start = time.time()
             try:
                 r = subprocess.run([sys.executable, "-u", str(script)],
@@ -164,7 +166,7 @@ def run_all():
         # Tabela
         total_elapsed = time.time() - total_start
         print("=" * 100)
-        print("  META-ORQUESTRADOR — RESULTADO FINAL")
+        print("  META-ORQUESTRADOR -- RESULTADO FINAL")
         print("=" * 100)
         hdr = "  {:<8} {:>4} {:>7} {:>8} {:>9} {:>9} {:>6} {:>7} {:>7} {:>5} {:>6}".format(
             "LLM", "GB", "STRESS", "BATTERY", "CREATIVE", "T_SWEEP", "SWEEP", "PPL", "ANALYZE", "RAM", "STATUS")

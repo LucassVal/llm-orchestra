@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
-bench_creative.py v3 — Criatividade × temperatura (child do orquestrador).
+bench_creative.py v3 -- Criatividade × temperatura (child do orquestrador).
 Mede: diversidade lexical, variância entre runs, factualidade, repetição.
 Usa llama-server recompilado. Output JSON via stdout.
 Log de progresso via stderr (não contamina JSON).

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=benchmark tool | WHY=avaliar LLMs locais | WHEN=pipeline run
 """
-bench_child.py v4 — worker DDD unificado.
+bench_child.py v4 -- worker DDD unificado.
 Testa 1 modelo × 1 método × N perguntas × reasoning ON/OFF.
 
 Camadas:
@@ -124,7 +126,7 @@ PROMPTS = [
 ]
 
 # ═══════════════════════════════════════════════════════════════════
-# INFRASTRUCTURE — Paths & Constantes
+# INFRASTRUCTURE -- Paths & Constantes
 # ═══════════════════════════════════════════════════════════════════
 
 LLAMA_CLI    = os.path.expanduser("~/llama.cpp/build/bin/llama-cli")
@@ -155,7 +157,7 @@ def trace() -> str:
     return str(uuid.uuid4())
 
 # ═══════════════════════════════════════════════════════════════════
-# INFRASTRUCTURE — LlamaCliRunner
+# INFRASTRUCTURE -- LlamaCliRunner
 # ═══════════════════════════════════════════════════════════════════
 
 class LlamaCliRunner:
@@ -197,7 +199,7 @@ class LlamaCliRunner:
             # Extrai resposta (filtra banners do llama.cpp)
             answer = _extract_answer(output)
 
-            tee(f"[llama-cli] ✓ {elapsed:.1f}s ({tok_s:.1f} tok/s) — {answer[:80]}")
+            tee(f"[llama-cli] ✓ {elapsed:.1f}s ({tok_s:.1f} tok/s) -- {answer[:80]}")
 
             return Result(status=Status.OK, method="llamacpp", question_id=tc.id,
                           question_text=tc.question, category=tc.category.value,
@@ -217,7 +219,7 @@ class LlamaCliRunner:
                           trace_id=trace())
 
 # ═══════════════════════════════════════════════════════════════════
-# INFRASTRUCTURE — LlamaServerRunner
+# INFRASTRUCTURE -- LlamaServerRunner
 # ═══════════════════════════════════════════════════════════════════
 
 class LlamaServerRunner:
@@ -275,7 +277,7 @@ class LlamaServerRunner:
             tok_s = tokens / req_elapsed if req_elapsed > 0 else 0
             prompt_tok_s = prompt_tokens / (elapsed - req_elapsed) if (elapsed - req_elapsed) > 0 else 0
 
-            tee(f"[llama-srv] ✓ {elapsed:.1f}s ({tok_s:.1f} tok/s) — {answer[:80]}")
+            tee(f"[llama-srv] ✓ {elapsed:.1f}s ({tok_s:.1f} tok/s) -- {answer[:80]}")
 
             return Result(status=Status.OK, method="llamaserver", question_id=tc.id,
                           question_text=tc.question, category=tc.category.value,
@@ -291,7 +293,7 @@ class LlamaServerRunner:
                           error=str(e)[:150], elapsed_s=round(elapsed, 1), trace_id=trace())
 
 # ═══════════════════════════════════════════════════════════════════
-# INFRASTRUCTURE — Parsers de output
+# INFRASTRUCTURE -- Parsers de output
 # ═══════════════════════════════════════════════════════════════════
 
 def _parse_timing(output: str) -> tuple:
@@ -356,7 +358,7 @@ def _extract_answer(output: str) -> str:
     return text.strip()[:200] if lines else "(sem output)"
 
 # ═══════════════════════════════════════════════════════════════════
-# APPLICATION — BenchmarkRunner
+# APPLICATION -- BenchmarkRunner
 # ═══════════════════════════════════════════════════════════════════
 
 class BenchmarkRunner:
@@ -547,7 +549,7 @@ class BenchmarkRunner:
         return self.results
 
 # ═══════════════════════════════════════════════════════════════════
-# PRESENTATION — Tabela Markdown
+# PRESENTATION -- Tabela Markdown
 # ═══════════════════════════════════════════════════════════════════
 
 def render_markdown(results: list, model_name: str) -> str:
@@ -579,9 +581,9 @@ def render_markdown(results: list, model_name: str) -> str:
 def render_sweep_markdown(results: list, model_name: str, sweep_param: str) -> str:
     """Gera tabela markdown para sweep paramétrico."""
     if not results:
-        return f"## {model_name} — Sweep {sweep_param}\n\n*Sem resultados.*\n"
+        return f"## {model_name} -- Sweep {sweep_param}\n\n*Sem resultados.*\n"
 
-    lines = [f"## {model_name} — Sweep `{sweep_param}`", ""]
+    lines = [f"## {model_name} -- Sweep `{sweep_param}`", ""]
 
     # Agrupa por valor do sweep
     from collections import defaultdict

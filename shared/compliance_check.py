@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+
+# 3W: WHAT=auditoria conformidade | WHY=verificar ecossistema | WHEN=commit ou 'make audit'
 """
-compliance_check.py v2 — Auditoria completa de conformidade.
+compliance_check.py v2 -- Auditoria completa de conformidade.
 Checks: triade, profiles, rules, daemon, ollama, ruff, env, skills,
         metrics_flow, ddd_hierarchy, orphan_files.
 Termos: PASS (conforme), FAIL (bloqueante), WARN (nao-bloqueante), TBT (stub).
@@ -108,7 +110,7 @@ def run():
         "detail": "ordenado" if isort_ok else "imports desordenados",
     }
 
-    # ═══ 6c. PY CHECK (substitui mypy — nativo, funciona Android) ═══
+    # ═══ 6c. PY CHECK (substitui mypy -- nativo, funciona Android) ═══
     r = subprocess.run(
         [sys.executable, str(BUILD/"shared"/"py_check.py")],
         capture_output=True, text=True,
@@ -290,7 +292,7 @@ def run():
         "status": "PASS" if len(test_files) >= 1 else "WARN",
         "detail": "{} test files".format(len(test_files)),
     }
-    print("COMPLIANCE AUDIT v2 — " + tstamp)
+    print("COMPLIANCE AUDIT v2 -- " + tstamp)
     print("{:<5} {:<20} {:<6} {}".format("#", "CHECK", "STATUS", "DETAIL"))
     print("-" * 70)
     passed = 0

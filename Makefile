@@ -36,8 +36,8 @@ gate: ## Pre-commit gate (audit + stub scan + bypass detection)
 hook-install: ## Instala pre-commit hook no .git/hooks/
 	@ln -sf ../../shared/pre_commit_hook.py $(BUILD)/.git/hooks/pre-commit && chmod +x $(BUILD)/.git/hooks/pre-commit && echo "hook instalado + executavel"
 
-lint: ## Ruff + isort (0 erros obrigatorio)
-	@cd $(BUILD) && ruff check . --exclude llama.cpp && isort --check-only --diff . --skip llama.cpp --skip __pycache__
+lint: ## Ruff + isort + py_check (0 erros obrigatorio)
+	@cd $(BUILD) && ruff check . --exclude llama.cpp && isort --check-only --diff . --skip llama.cpp --skip __pycache__ && python3 shared/py_check.py
 
 types: ## Mypy type checking (TBT no Termux)
 	@cd $(BUILD) && mypy . --ignore-missing-imports || true

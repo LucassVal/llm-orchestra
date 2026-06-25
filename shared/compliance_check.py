@@ -108,15 +108,15 @@ def run():
         "detail": "ordenado" if isort_ok else "imports desordenados",
     }
 
-    # ═══ 6c. MYPY ═══
+    # ═══ 6c. PY CHECK (substitui mypy — nativo, funciona Android) ═══
     r = subprocess.run(
-        ["mypy", str(BUILD), "--ignore-missing-imports"],
+        [sys.executable, str(BUILD/"shared"/"py_check.py")],
         capture_output=True, text=True,
     )
-    mypy_ok = r.returncode == 0
-    results["6c_mypy"] = {
-        "status": "PASS" if mypy_ok else "WARN",
-        "detail": "ok" if mypy_ok else r.stderr.strip()[:60] if r.stderr else "erro_desconhecido",
+    py_ok = r.returncode == 0
+    results["6c_pycheck"] = {
+        "status": "PASS" if py_ok else "FAIL",
+        "detail": r.stdout.strip().split("\n")[-1][:60] if r.stdout else "?",
     }
 
     # ═══ 6d. PYTEST ═══
@@ -139,6 +139,26 @@ def run():
     }
 
     # ═══ 6e. CIRCULARITY ═══
+    r = subprocess.run(
+        [sys.executable, str(BUILD/"shared"/"circularity_check.py")],
+        capture_output=True, text=True,
+    )
+    circ_ok = r.returncode == 0
+    results["6e_deps"] = {
+        "status": "PASS" if circ_ok else "FAIL",
+        "detail": r.stdout.strip().split("\n")[-1][:80] if r.stdout else "?",
+    }
+
+    # ═══ 6f. AI SLOP ═══
+    r = subprocess.run(
+        ["aislop", str(BUILD), "--ignore", "llama.cpp", "--exit-zero"],
+        capture_output=True, text=True,
+    )
+    slop_issues = len([line for line in r.stdout.split("\n") if line.strip()])
+    results["6f_slop"] = {
+        "status": "PASS" if slop_issues == 0 else "FAIL",
+        "detail": "0 slops" if slop_issues == 0 else "{} slops".format(slop_issues),
+    }
     r = subprocess.run(
         [sys.executable, str(BUILD/"shared"/"circularity_check.py")],
         capture_output=True, text=True,

@@ -51,7 +51,7 @@ def scan_stubs():
 
     for py_file in BUILD.rglob("*.py"):
         skip = False
-        for d in ["llama.cpp", "__pycache__", ".git"]:
+        for d in ["llama.cpp", "__pycache__", ".git", "shared/pre_commit_hook.py"]:
             if d in str(py_file):
                 skip = True
                 break
@@ -77,6 +77,26 @@ def scan_stubs():
     return findings
 
 
+def run_slop():
+    """Roda aislop — detector de AI slop (padroes de agentes)."""
+    r = subprocess.run(
+        ["aislop", str(BUILD), "--ignore", "llama.cpp", "--exit-zero"],
+        capture_output=True, text=True,
+    )
+    issues = len([line for line in r.stdout.split("\n") if line.strip()])
+    return issues == 0, r.stdout, issues
+
+
+def run_mock_tests():
+    """Roda pytest com mock — testes unitarios."""
+    r = subprocess.run(
+        ["pytest", str(BUILD/"tests"), "-q", "--tb=short"],
+        capture_output=True, text=True,
+        cwd=str(BUILD),  # precisa do PYTHONPATH correto
+    )
+    return r.returncode == 0, r.stdout
+
+
 def run_audit():
     """Roda compliance_check.py e retorna (passed, output)."""
     r = subprocess.run(
@@ -88,7 +108,33 @@ def run_audit():
 
 def main():
     findings = scan_stubs()
+    slop_ok, slop_out, slop_issues = run_slop()
+    mock_ok, mock_out = run_mock_tests()
     audit_ok, audit_out = run_audit()
+
+    # ── AI Slop ──
+    if not slop_ok:
+        print("=" * 70)
+        print("  AI SLOP DETECTOR (aislop) — {} achados".format(slop_issues))
+        print("=" * 70)
+        for line in slop_out.strip().split("\n")[:20]:
+            if line.strip():
+                print("  " + line[:100])
+        print("=" * 70)
+        print()
+
+    # ── Mock Tests ──
+    if not mock_ok:
+        print("=" * 70)
+        print("  MOCK TESTS (pytest) — FAIL")
+        print("=" * 70)
+        for line in mock_out.strip().split("\n")[:10]:
+            if line.strip():
+                print("  " + line[:100])
+        print("=" * 70)
+        print()
+    else:
+        print("MOCK TESTS: " + mock_out.strip().split("\n")[-1][:80] if mock_out.strip() else "ok")
 
     # ── Stub scan ──
     if findings:
@@ -105,21 +151,23 @@ def main():
     # ── Compliance ──
     print(audit_out)
 
-    # ── Gate ──
-    has_issues = findings or not audit_ok
+    # ── GATE (ALL ERR) ──
+    has_issues = bool(findings) or not slop_ok or not mock_ok or not audit_ok
 
     if not has_issues:
-        print("✓ GATE: limpo. Commit liberado.")
+        print("✓ GATE: limpo (stubs=0, slop=ok, mock=ok, audit=PASS). Commit liberado.")
         return 0
 
     if NO_BYPASS:
         print("⛔ GATE: BLOQUEADO (--no-bypass). Corrija os itens acima.")
         return 1
 
-    # User pode aprovar bypass
     print()
-    print("⛔ GATE: {} stub(s) + audit={}".format(
-        len(findings), "PASS" if audit_ok else "FAIL"))
+    print("⛔ GATE: stub={} slop={} mock={} audit={}".format(
+        len(findings),
+        "FAIL({})".format(slop_issues) if not slop_ok else "PASS",
+        "FAIL" if not mock_ok else "PASS",
+        "FAIL" if not audit_ok else "PASS"))
     print()
     try:
         ans = input("Deseja COMMIT mesmo assim? [s/N] ").strip().lower()

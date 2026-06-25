@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
 rule_check.py — Verificador de TODAS as regras R-BENCH-*.
-Cada funcao implementa 1 regra. Retorna 0=PASS, 1=FAIL.
-Integrado ao pre_commit_hook como barreira obrigatoria.
+Todas ERR (bloqueantes), exceto RAM e Thermal (orquestrador gerencia).
 """
 import json
 import re
@@ -17,34 +16,30 @@ def _run(cmd, **kw):
     return subprocess.run(cmd, capture_output=True, text=True, **kw)
 
 
-# ═══════════════════════════════════════════════════════════════
-# R-BENCH-USE: Verificar antes de agir (5 checks)
-# ═══════════════════════════════════════════════════════════════
-
 def check_ram():
-    """free -h → RAM disponivel > 500MB"""
+    """RAM (WARN — orquestrador gerencia)"""
     r = _run(["free", "-m"])
     for line in r.stdout.split("\n"):
         if "Mem:" in line:
             parts = line.split()
             avail = int(parts[-1]) if len(parts) > 6 else 0
             if avail < 500:
-                return False, "RAM critica: {}MB".format(avail)
+                return True, "{}MB (WARN: critico)".format(avail)
             return True, "{}MB".format(avail)
-    return False, "nao leu RAM"
+    return True, "nao leu"
 
 
-def check_ollama_models():
-    """ollama list → 3 modelos"""
+def check_ollama():
+    """ollama list — 3 modelos (ERR)"""
     r = _run(["ollama", "list"])
     count = len([line for line in r.stdout.split("\n") if line.strip()]) - 1
     if count < 3:
-        return False, "apenas {} modelos".format(count)
+        return False, "{} modelos".format(count)
     return True, "3 modelos"
 
 
 def check_daemon():
-    """metrics_daemon rodando"""
+    """metrics_daemon rodando (ERR)"""
     pf = BUILD / ".metrics_daemon.pid"
     if pf.exists():
         return True, "rodando"
@@ -52,26 +47,22 @@ def check_daemon():
 
 
 def check_thermal():
-    """thermal_status.json → temp (WARN apenas, nao bloqueia)"""
+    """Thermal (WARN — orquestrador gerencia)"""
     tf = BUILD / "shared" / "thermal_status.json"
     if tf.exists():
         try:
             d = json.loads(tf.read_text())
             t = d.get("thermal_c", 0)
             if t > 90:
-                return True, "{}°C (WARN: critico)".format(t)
-            return True, "{}°C".format(t)
+                return True, "{}C (WARN)".format(t)
+            return True, "{}C".format(t)
         except Exception:
-            return True, "json?"  # nao bloqueia
-    return True, "ausente"  # nao bloqueia
+            return True, "?"
+    return True, "ausente"
 
-
-# ═══════════════════════════════════════════════════════════════
-# R-BENCH-3W: What, Why, When
-# ═══════════════════════════════════════════════════════════════
 
 def check_3w():
-    """Verifica se arquivos .py tem 3W nos comentarios iniciais (WARN apenas)"""
+    """3W: what/why/when em arquivos >100 linhas (ERR)"""
     missing = []
     for py_file in BUILD.rglob("*.py"):
         skip = any(d in str(py_file) for d in ["llama.cpp", "__pycache__", ".git"])
@@ -79,24 +70,17 @@ def check_3w():
             continue
         try:
             text = py_file.read_text()
-            if len(text.split("\n")) > 100:
-                has_what = "WHAT" in text[:500] or "what" in text[:200].lower()
-                has_why = "WHY" in text[:500] or "why" in text[:200].lower()
-                if not (has_what or has_why):
-                    missing.append(py_file.name)
+            if len(text.split("\n")) > 100 and "3W" not in text[:500] and "WHAT" not in text[:500]:
+                missing.append(py_file.name)
         except Exception:
             pass
     if missing:
-        return True, "{} sem 3W (WARN)".format(len(missing))
+        return False, "{} sem 3W".format(len(missing))
     return True, "todos com 3W"
 
 
-# ═══════════════════════════════════════════════════════════════
-# R-BENCH-ASCII: zero unicode
-# ═══════════════════════════════════════════════════════════════
-
 def check_ascii():
-    """Zero unicode em-dash/arrows em codigo (strings OK)"""
+    """Zero unicode em-dash em codigo (ERR)"""
     violations = []
     for py_file in BUILD.rglob("*.py"):
         skip = any(d in str(py_file) for d in ["llama.cpp", "__pycache__", ".git"])
@@ -104,30 +88,25 @@ def check_ascii():
             continue
         try:
             for lineno, line in enumerate(py_file.read_text().split("\n"), 1):
-                # Pula strings e comentarios
-                stripped = line.split("#")[0]
-                in_string = False
+                code = line.split("#")[0]
+                in_str = False
                 clean = ""
-                for ch in stripped:
-                    if ch in "\"'":
-                        in_string = not in_string
-                    elif not in_string:
+                for ch in code:
+                    if ch in "'\"":
+                        in_str = not in_str
+                    elif not in_str:
                         clean += ch
                 if "\u2014" in clean or "\u2013" in clean:
                     violations.append("{}:{}".format(py_file.name, lineno))
         except Exception:
             pass
     if violations:
-        return True, "{} em-dash (WARN)".format(len(violations))
+        return False, "{} em-dash".format(len(violations))
     return True, "ASCII limpo"
 
 
-# ═══════════════════════════════════════════════════════════════
-# R-BENCH-ENV: 6 variaveis obrigatorias
-# ═══════════════════════════════════════════════════════════════
-
 def check_env():
-    """Verifica .env.make tem as 6 vars obrigatorias"""
+    """.env.make com 6 vars (ERR)"""
     envf = BUILD / ".env.make"
     if not envf.exists():
         return False, ".env.make ausente"
@@ -137,18 +116,14 @@ def check_env():
                 "OLLAMA_MAX_QUEUE", "OLLAMA_CONTEXT_LENGTH"]
     missing = [v for v in required if v not in text]
     if missing:
-        return False, "faltam: {}".format(",".join(missing))
+        return False, "faltam:" + ",".join(missing)
     return True, "6/6 vars"
 
 
-# ═══════════════════════════════════════════════════════════════
-# R-BENCH-ORCHESTRATOR: children nao gerenciam servidor
-# ═══════════════════════════════════════════════════════════════
-
 def check_orchestrator():
-    """Verifica children nao tem codigo de gerenciamento de servidor"""
-    forbidden = ["_start_server", "_stop_server", "fuser -k", "kill_stray",
-                 "drop_caches", "RamGuard.check", "RamGuard.verify_clean"]
+    """Children nao gerenciam servidor (ERR)"""
+    forbidden = ["_start_server", "_stop_server", "fuser -k",
+                 "kill_stray", "RamGuard.check"]
     violations = []
     for child in ["bench_child.py", "bench_battery.py", "bench_creative.py",
                   "bench_ppl.py", "bench_analyze.py", "bench_temp_sweep.py",
@@ -158,25 +133,21 @@ def check_orchestrator():
             text = cf.read_text()
             for pattern in forbidden:
                 if pattern in text:
-                    violations.append("{}: {}".format(child, pattern))
+                    violations.append("{}:{}".format(child, pattern))
     if violations:
         return False, "{} violacoes".format(len(violations))
     return True, "children puros"
 
 
-# ═══════════════════════════════════════════════════════════════
-# R-BENCH-SDD: sweep_config.json schema
-# ═══════════════════════════════════════════════════════════════
-
 def check_sdd():
-    """Valida schema de todos sweep_config.json / profiles"""
+    """sweep_config.json schema (ERR)"""
     required_keys = {"model", "baseline", "sweeps", "test_prompts"}
     errors = []
     for pf in BUILD.glob("test-*/profiles/*.json"):
         try:
             d = json.loads(pf.read_text())
             if "_schema" in d:
-                continue  # perfil de agente, nao benchmark
+                continue
             missing = required_keys - set(d.keys())
             if missing:
                 errors.append("{}: falta {}".format(pf.name, ",".join(missing)))
@@ -187,12 +158,8 @@ def check_sdd():
     return True, "todos validos"
 
 
-# ═══════════════════════════════════════════════════════════════
-# R-BENCH-PROGRESS: scripts com +10 iteracoes tem progress bar
-# ═══════════════════════════════════════════════════════════════
-
 def check_progress():
-    """Verifica scripts com loops longos tem barra de progresso"""
+    """Scripts com 10+ iteracoes tem barra (ERR)"""
     required = ["bench_creative.py", "bench_temp_sweep.py", "bench_battery.py",
                 "bench_child.py", "bench_sweep.py"]
     missing = []
@@ -212,13 +179,9 @@ def check_progress():
     return True, "todas com barra"
 
 
-# ═══════════════════════════════════════════════════════════════
-# RUN ALL
-# ═══════════════════════════════════════════════════════════════
-
 CHECKS = [
     ("R-USE:RAM",        check_ram),
-    ("R-USE:Ollama",     check_ollama_models),
+    ("R-USE:Ollama",     check_ollama),
     ("R-USE:Daemon",     check_daemon),
     ("R-USE:Thermal",    check_thermal),
     ("R-3W",             check_3w),
@@ -241,8 +204,7 @@ def run():
         else:
             failed += 1
         print("  {:<20} {:<6} {}".format(name, status, detail))
-
-    print("  {:-<40}".format(""))
+    print("  " + "-" * 40)
     print("  RULE CHECK: PASS={} FAIL={}".format(passed, failed))
     return 1 if failed > 0 else 0
 

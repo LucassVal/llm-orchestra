@@ -256,7 +256,16 @@ def run():
     else:
         results["12_maker"] = {"status": "FAIL", "detail": "ausente"}
 
-    # ═══ 13. AGENTS ═══
+    # ═══ 14. RULE CHECK ═══
+    r = subprocess.run(
+        [sys.executable, str(BUILD/"shared"/"rule_check.py")],
+        capture_output=True, text=True,
+    )
+    rule_ok = r.returncode == 0
+    results["14_rules"] = {
+        "status": "PASS" if rule_ok else "FAIL",
+        "detail": r.stdout.strip().split("\n")[-1][:60] if r.stdout else "?",
+    }
     agents_dir = Path.home()/"agents"
     if agents_dir.exists():
         contracts = list(agents_dir.glob("*.json"))

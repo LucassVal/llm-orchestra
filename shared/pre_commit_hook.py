@@ -97,6 +97,15 @@ def run_mock_tests():
     return r.returncode == 0, r.stdout
 
 
+def run_rules():
+    """Roda rule_check.py — todas regras R-BENCH-*."""
+    r = subprocess.run(
+        [sys.executable, str(BUILD/"shared"/"rule_check.py")],
+        capture_output=True, text=True,
+    )
+    return r.returncode == 0, r.stdout
+
+
 def run_audit():
     """Roda compliance_check.py e retorna (passed, output)."""
     r = subprocess.run(
@@ -110,7 +119,17 @@ def main():
     findings = scan_stubs()
     slop_ok, slop_out, slop_issues = run_slop()
     mock_ok, mock_out = run_mock_tests()
+    rules_ok, rules_out = run_rules()
     audit_ok, audit_out = run_audit()
+
+    # ── Rules ──
+    if not rules_ok:
+        print("=" * 70)
+        print("  RULE CHECK (R-BENCH-*) — FAIL")
+        print("=" * 70)
+        print(rules_out)
+        print("=" * 70)
+        print()
 
     # ── AI Slop ──
     if not slop_ok:
@@ -152,10 +171,10 @@ def main():
     print(audit_out)
 
     # ── GATE (ALL ERR) ──
-    has_issues = bool(findings) or not slop_ok or not mock_ok or not audit_ok
+    has_issues = bool(findings) or not slop_ok or not mock_ok or not rules_ok or not audit_ok
 
     if not has_issues:
-        print("✓ GATE: limpo (stubs=0, slop=ok, mock=ok, audit=PASS). Commit liberado.")
+        print("✓ GATE: limpo (stubs=0, slop=ok, mock=ok, rules=ok, audit=PASS). Commit liberado.")
         return 0
 
     if NO_BYPASS:
@@ -163,10 +182,11 @@ def main():
         return 1
 
     print()
-    print("⛔ GATE: stub={} slop={} mock={} audit={}".format(
+    print("⛔ GATE: stub={} slop={} mock={} rules={} audit={}".format(
         len(findings),
         "FAIL({})".format(slop_issues) if not slop_ok else "PASS",
         "FAIL" if not mock_ok else "PASS",
+        "FAIL" if not rules_ok else "PASS",
         "FAIL" if not audit_ok else "PASS"))
     print()
     try:

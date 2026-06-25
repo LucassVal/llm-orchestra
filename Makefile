@@ -30,8 +30,11 @@ boot: ## Health check completo + compliance audit
 audit: ## Compliance audit (triade mirror, profiles, rules, daemon, ollama, ruff, env, skills)
 	@cd $(BUILD) && python3 shared/compliance_check.py
 
-gate: ## Pre-commit gate (audit + stub scan + bypass detection)
+gate: ## Pre-commit gate (stub + slop + mock + rules + audit)
 	@cd $(BUILD) && python3 shared/pre_commit_hook.py
+
+rules: ## Rule check (todas R-BENCH-*)
+	@cd $(BUILD) && python3 shared/rule_check.py
 
 hook-install: ## Instala pre-commit hook no .git/hooks/
 	@ln -sf ../../shared/pre_commit_hook.py $(BUILD)/.git/hooks/pre-commit && chmod +x $(BUILD)/.git/hooks/pre-commit && echo "hook instalado + executavel"

@@ -1,8 +1,13 @@
 # Makefile — Bench-LLM v5: Orquestracao de benchmarks locais
 # Meta-orquestrador com status em tempo real e autoridade de parada
 # DDD: orquestrador DONO do servidor, children clientes puros
-# SDD: sweep_config.json como spec canônica de parâmetros
+# SDD: sweep_config.json como spec canonica de parametros
 # Harness: ProcessRegistry + decay_shutdown preventivo
+#
+# ORDEM CANONICA (enforced):
+#   1. CHECKPOINT: lint → deps → rules → audit → gate
+#   2. ACTIONS:    pipeline, run, agent-create, etc.
+#   Regra: checkpoint MUST pass before any action.
 
 BUILD := $(HOME)/build
 ENV_MK := $(BUILD)/.env.make
@@ -16,19 +21,50 @@ export OLLAMA_FLASH_ATTENTION
 export OLLAMA_MAX_QUEUE
 export OLLAMA_CONTEXT_LENGTH
 
-.PHONY: help status stop pipeline-4b pipeline-coder pipeline-gemma pipeline-all
+.PHONY: help checkpoint boot audit clean test install gate rules hook-install lint types deps \
+        pipeline-4b pipeline-coder pipeline-gemma pipeline-all stress ppl sweep run serve \
+        report report-obsidian report-watch agent-create agent-validate agent-profiles multi \
+        daemon-start daemon-stop daemon-status
 
-help: ## Mostra todos os targets
-	@echo "Bench-LLM v5 — Orquestracao de LLMs locais + Motor de Agente"
+
+# ═══════════════════════════════════════════════════════════════
+# CHECKPOINT — obrigatorio antes de qualquer acao
+# ═══════════════════════════════════════════════════════════════
+
+checkpoint: lint deps rules audit
 	@echo ""
-	@echo "BOOT:"
-	@echo "  make boot          — Health check completo (paths, envs, daemon, ruff)"
+	@echo "✓ CHECKPOINT: lint + deps + rules + audit — todos PASS"
+	@echo ""
 
-boot: ## Health check completo + compliance audit
+lint: ## [1/5] Ruff + isort + py_check (0 erros obrigatorio)
+	@cd $(BUILD) && ruff check . --exclude llama.cpp && \
+	 isort --check-only --diff . --skip llama.cpp --skip __pycache__ && \
+	 python3 shared/py_check.py
+
+deps: ## [2/5] Circularity check (import cycles, 0 obrigatorio)
+	@cd $(BUILD) && python3 shared/circularity_check.py
+
+rules: ## [3/5] Rule check (13 R-BENCH-*, todas ERR exceto RAM+Thermal)
+	@cd $(BUILD) && python3 shared/rule_check.py
+
+audit: ## [4/5] Compliance audit (21 checks: triade, DDD, orphans, MCP...)
 	@cd $(BUILD) && python3 shared/compliance_check.py
 
-audit: ## Compliance audit (triade mirror, profiles, rules, daemon, ollama, ruff, env, skills)
-	@cd $(BUILD) && python3 shared/compliance_check.py
+gate: ## [5/5] Pre-commit gate (stub + slop + mock + rules + audit)
+	@cd $(BUILD) && python3 shared/pre_commit_hook.py
+
+
+# ═══════════════════════════════════════════════════════════════
+# SETUP
+# ═══════════════════════════════════════════════════════════════
+
+boot: checkpoint ## Health check completo (checkpoint + overview)
+	@echo ""
+	@echo "=== BOOT: LLM-Orchestra ==="
+	@echo "  Ollama: $$(ollama list 2>/dev/null | tail -n+2 | wc -l) modelos"
+	@echo "  RAM: $$(free -h | awk '/Mem:/{print $$4}') livre"
+	@echo "  Daemon: $$(kill -0 $$(cat $(BUILD)/.metrics_daemon.pid 2>/dev/null) 2>/dev/null && echo rodando || echo parado)"
+	@echo ""
 
 clean: ## Limpa logs, cache, temp
 	@cd $(BUILD) && rm -rf logs/*.log __pycache__ */__pycache__ .pytest_cache && echo "limpo"
@@ -36,97 +72,101 @@ clean: ## Limpa logs, cache, temp
 test: ## Roda todos os testes (pytest + smoke)
 	@cd $(BUILD) && pytest tests/ -v
 
-install: ## Setup automatizado do ecossistema
+install: checkpoint ## Setup automatizado do ecossistema
 	@echo "=== INSTALL: LLM-Orchestra ==="
 	@pip install -q ruff isort pytest mock aislop 2>/dev/null
 	@cd $(BUILD) && make hook-install
 	@cd $(BUILD) && make daemon-start 2>/dev/null || true
-	@echo "✓ Instalado. Rode 'make boot' para verificar."
-
-gate: ## Pre-commit gate (stub + slop + mock + rules + audit)
-	@cd $(BUILD) && python3 shared/pre_commit_hook.py
-
-rules: ## Rule check (todas R-BENCH-*)
-	@cd $(BUILD) && python3 shared/rule_check.py
+	@echo "✓ Instalado."
 
 hook-install: ## Instala pre-commit hook no .git/hooks/
-	@ln -sf ../../shared/pre_commit_hook.py $(BUILD)/.git/hooks/pre-commit && chmod +x $(BUILD)/.git/hooks/pre-commit && echo "hook instalado + executavel"
+	@ln -sf ../../shared/pre_commit_hook.py $(BUILD)/.git/hooks/pre-commit && \
+	 chmod +x $(BUILD)/.git/hooks/pre-commit && \
+	 echo "hook instalado + executavel"
 
-lint: ## Ruff + isort + py_check (0 erros obrigatorio)
-	@cd $(BUILD) && ruff check . --exclude llama.cpp && isort --check-only --diff . --skip llama.cpp --skip __pycache__ && python3 shared/py_check.py
 
-types: ## Mypy type checking (TBT no Termux)
-	@cd $(BUILD) && mypy . --ignore-missing-imports || true
+# ═══════════════════════════════════════════════════════════════
+# PIPELINE (requer checkpoint)
+# ═══════════════════════════════════════════════════════════════
 
-deps: ## Circularity check (import cycles)
-	@cd $(BUILD) && python3 shared/circularity_check.py
-	@echo ""
-	@echo "PIPELINE POR LLM:"
-	@echo "  make pipeline-4b   — Pipeline completo no Qwen3-4B (worker leve padrao)"
-	@echo "  make pipeline-coder— Pipeline completo no qwen2.5-coder (worker pesado)"
-	@echo "  make pipeline-gemma— Pipeline completo no gemma4:e4b (orquestrador/cerebro)"
-	@echo ""
-	@echo "META (todos em sequencia):"
-	@echo "  make pipeline-all  — 4B > coder > gemma (meta-orquestrador)"
-	@echo ""
-	@echo "TESTES INDIVIDUAIS:"
-	@echo "  make stress MODELO=qwen3:4b  — Stress test 3 fases"
-	@echo "  make ppl    MODELO=qwen3:4b  — Perplexidade 10 frases"
-	@echo "  make sweep  MODELO=qwen3:4b  — Sweep parametrico (via sweep_config.json)"
-
-status: ## Status em tempo real do pipeline
-	@cd $(BUILD) && python3 meta_orchestrator.py --status
-
-stop: ## Para o pipeline ativo
-	@cd $(BUILD) && python3 meta_orchestrator.py --stop
-
-pipeline-4b: ## Pipeline completo no worker leve (4B)
+pipeline-4b: checkpoint ## Pipeline completo na 4B (worker leve padrao)
 	@cd $(BUILD) && python3 test-4b/orchestrator.py
 
-pipeline-coder: ## Pipeline completo no worker pesado (coder)
+pipeline-coder: checkpoint ## Pipeline completo no coder (worker pesado)
 	@cd $(BUILD) && python3 test-coder/orchestrator.py
 
-pipeline-gemma: ## Pipeline completo no orquestrador (gemma)
+pipeline-gemma: checkpoint ## Pipeline completo na gemma (cerebro)
 	@cd $(BUILD) && python3 test-gemma/orchestrator.py
 
-pipeline-all: ## Meta: 4B > coder > gemma
+pipeline-all: checkpoint ## Meta: 4B > coder > gemma
 	@cd $(BUILD) && python3 meta_orchestrator.py
 
-stress: ## Stress test em 1 modelo (MODELO=...)
+
+# ═══════════════════════════════════════════════════════════════
+# TESTES INDIVIDUAIS (requer checkpoint)
+# ═══════════════════════════════════════════════════════════════
+
+stress: checkpoint ## Stress test em 1 modelo (MODELO=qwen3:4b)
 	@cd $(BUILD) && python3 bench_orchestrator.py --discover --stress --model $(MODELO)
 
-ppl: ## PPL em 1 modelo (MODELO=...)
+ppl: checkpoint ## PPL em 1 modelo (MODELO=qwen3:4b)
 	@cd $(BUILD) && python3 bench_orchestrator.py --discover --ppl-only --model $(MODELO)
 
-sweep: ## Sweep parametrico em 1 modelo (MODELO=...)
-	@cd $(BUILD) && python3 bench_sweep.py --model-name $(MODELO) --config $(BUILD)/test-*/sweep_config.json
+sweep: checkpoint ## Sweep parametrico em 1 modelo (MODELO=qwen3:4b)
+	@cd $(BUILD) && python3 bench_sweep.py --model-name $(MODELO) --config test-4b/sweep_config.json
 
-run: ## Executa 1 inferencia com perfil (PROMPT="..." MODELO=4b PERFIL=agent_default)
+
+# ═══════════════════════════════════════════════════════════════
+# AGENTE (requer checkpoint)
+# ═══════════════════════════════════════════════════════════════
+
+run: checkpoint ## Executa 1 inferencia com perfil (PROMPT="..." MODELO=4b PERFIL=agent_default)
 	@cd $(BUILD) && python3 meta_orchestrator.py --run "$(PROMPT)" --model $(MODELO) --profile $(PERFIL)
 
-serve: ## Sobe servidor seguro para agentes (MODELO=4b)
+serve: checkpoint ## Sobe servidor seguro para agentes (MODELO=4b)
 	@cd $(BUILD) && python3 meta_orchestrator.py --serve --model $(MODELO)
+
+
+# ═══════════════════════════════════════════════════════════════
+# METRICAS (nao requer checkpoint — leitura apenas)
+# ═══════════════════════════════════════════════════════════════
 
 report: ## Relatorio de metricas (via meta)
 	@cd $(BUILD) && python3 meta_orchestrator.py --report
 
-report-obsidian: ## Relatorio + Obsidian vault (via meta)
+report-obsidian: ## Relatorio + Obsidian vault
 	@cd $(BUILD) && python3 meta_orchestrator.py --report --obsidian
 
 report-watch: ## Loop 5s de metricas (Ctrl+C p/ sair)
 	@cd $(BUILD) && python3 shared/metrics_reporter.py --obsidian --watch
 
-agent-create: ## Cria agente via contrato (CONTRACT=~/agents/meu_agente.json)
+status: ## Status pipeline em tempo real
+	@cd $(BUILD) && python3 meta_orchestrator.py --status
+
+stop: ## Para o pipeline ativo
+	@cd $(BUILD) && python3 meta_orchestrator.py --stop
+
+
+# ═══════════════════════════════════════════════════════════════
+# FABRICA DE AGENTES (requer checkpoint)
+# ═══════════════════════════════════════════════════════════════
+
+agent-create: checkpoint ## Cria agente via contrato (CONTRACT=~/agents/x.json)
 	@cd $(BUILD) && python3 shared/agent_factory.py create --contract $(CONTRACT)
 
-agent-validate: ## Valida contrato de agente (CONTRACT=~/agents/meu_agente.json)
+agent-validate: ## Valida contrato (nao requer checkpoint)
 	@cd $(BUILD) && python3 shared/agent_factory.py validate --contract $(CONTRACT)
 
 agent-profiles: ## Lista perfis disponiveis por LLM
 	@cd $(BUILD) && python3 shared/agent_factory.py list-profiles
 
-multi: ## Orquestrador multi-agente (list/run/pipeline)
+multi: checkpoint ## Orquestrador multi-agente (ARGS="list")
 	@cd $(BUILD) && python3 shared/multi_agent.py $(ARGS)
+
+
+# ═══════════════════════════════════════════════════════════════
+# DAEMON (nao requer checkpoint — controle operacional)
+# ═══════════════════════════════════════════════════════════════
 
 daemon-start: ## Inicia metrics_daemon (via meta)
 	@cd $(BUILD) && python3 meta_orchestrator.py --daemon start
@@ -136,3 +176,42 @@ daemon-stop: ## Para metrics_daemon (via meta)
 
 daemon-status: ## Verifica metrics_daemon (via meta)
 	@cd $(BUILD) && python3 meta_orchestrator.py --daemon status
+
+types: ## Mypy type checking (TBT no Termux)
+	@cd $(BUILD) && mypy . --ignore-missing-imports || true
+
+
+# ═══════════════════════════════════════════════════════════════
+# HELP
+# ═══════════════════════════════════════════════════════════════
+
+help: ## Mostra todos os targets
+	@echo "LLM-Orchestra v5 — Orquestracao de LLMs Locais + Motor de Agente"
+	@echo ""
+	@echo "⚠ ORDEM CANONICA (pre-commit requer checkpoint):"
+	@echo "  make checkpoint   — [1]lint [2]deps [3]rules [4]audit [5]gate"
+	@echo "  make lint         — ruff + isort + py_check"
+	@echo "  make deps         — circularity check"
+	@echo "  make rules        — 13 regras R-BENCH-*"
+	@echo "  make audit        — compliance (21 checks)"
+	@echo "  make gate         — stub + slop + mock + rules + audit"
+	@echo ""
+	@echo "PIPELINE (requer checkpoint):"
+	@echo "  make pipeline-4b  — Qwen3-4B (worker leve padrao)"
+	@echo "  make pipeline-coder — qwen2.5-coder (worker pesado)"
+	@echo "  make pipeline-gemma — gemma4:e4b (cerebro)"
+	@echo "  make pipeline-all — 4B > coder > gemma"
+	@echo ""
+	@echo "AGENTE (requer checkpoint):"
+	@echo "  make run PROMPT=\"...\" MODELO=4b PERFIL=agent_default"
+	@echo "  make serve MODELO=4b"
+	@echo ""
+	@echo "FABRICA (requer checkpoint):"
+	@echo "  make agent-create CONTRACT=~/agents/x.json"
+	@echo "  make multi ARGS=\"list\""
+	@echo ""
+	@echo "METRICAS (leitura, nao requer checkpoint):"
+	@echo "  make report / report-obsidian / status / stop"
+	@echo ""
+	@echo "DAEMON: make daemon-start / daemon-stop / daemon-status"
+	@echo "SETUP: make boot / install / clean / test / hook-install"

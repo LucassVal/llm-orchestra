@@ -30,6 +30,12 @@ boot: ## Health check completo + compliance audit
 audit: ## Compliance audit (triade mirror, profiles, rules, daemon, ollama, ruff, env, skills)
 	@cd $(BUILD) && python3 shared/compliance_check.py
 
+gate: ## Pre-commit gate (audit + stub scan + bypass detection)
+	@cd $(BUILD) && python3 shared/pre_commit_hook.py
+
+hook-install: ## Instala pre-commit hook no .git/hooks/
+	@ln -sf ../../shared/pre_commit_hook.py $(BUILD)/.git/hooks/pre-commit && echo "hook instalado"
+
 lint: ## Ruff + isort (0 erros obrigatorio)
 	@cd $(BUILD) && ruff check . --exclude llama.cpp && isort --check-only --diff . --skip llama.cpp --skip __pycache__
 

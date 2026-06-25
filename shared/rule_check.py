@@ -18,26 +18,113 @@ def _run(cmd, **kw):
     return subprocess.run(cmd, capture_output=True, text=True, **kw)
 
 
-def check_ram():
-    """RAM (WARN -- orquestrador gerencia)"""
+# ═══════════════════════════════════════════════════════════════
+# R-USE: Verificar sistema antes de qualquer acao (ERR)
+# ═══════════════════════════════════════════════════════════════
+
+def check_use():
+    """5 verificacoes obrigatorias antes de agir (ERR)"""
+    issues = []
+    # 1. Pipeline status
+    if (BUILD/"bench_status.json").exists():
+        try:
+            d = json.loads((BUILD/"bench_status.json").read_text())
+            if d.get("phase") not in (None, "done"):
+                issues.append("pipeline ativo: {}".format(d.get("phase")))
+        except Exception:
+            pass
+    # 2. RAM
     r = _run(["free", "-m"])
     for line in r.stdout.split("\n"):
         if "Mem:" in line:
             parts = line.split()
             avail = int(parts[-1]) if len(parts) > 6 else 0
             if avail < 500:
-                return True, "{}MB (WARN: critico)".format(avail)
+                issues.append("RAM critica: {}MB".format(avail))
+    # 3. Ollama
+    r = _run(["ollama", "list"])
+    if r.returncode != 0:
+        issues.append("Ollama offline")
+    # 4. Daemon
+    if not (BUILD/".metrics_daemon.pid").exists():
+        issues.append("daemon parado")
+    # 5. Thermal (WARN — governador gerencia)
+    tf = BUILD/"shared"/"thermal_status.json"
+    if tf.exists():
+        try:
+            d = json.loads(tf.read_text())
+            if d.get("thermal_c", 105) > 95:
+                pass  # nao bloqueia — governador gerencia
+        except Exception:
+            pass
+    if issues:
+        return False, "{} checks falharam: {}".format(len(issues), "; ".join(issues[:3]))
+    return True, "5/5 checks OK"
+
+
+# ═══════════════════════════════════════════════════════════════
+# R-VALIDATE: Validar espelhos maker antes de commit (ERR)
+# ═══════════════════════════════════════════════════════════════
+
+def check_mirror():
+    """Valida espelhamento Makefile <-> maker CLI <-> .ps1 (ERR)"""
+    r = _run([sys.executable, str(BUILD/"shared"/"triade_check.py")])
+    if r.returncode != 0:
+        return False, "triade dessincronizada"
+    return True, "triade espelhada"
+
+
+# ═══════════════════════════════════════════════════════════════
+# R-SEARCH: Validar MCPs e ferramentas de busca (ERR)
+# ═══════════════════════════════════════════════════════════════
+
+def check_ram():
+    """RAM (WARN — orquestrador gerencia)"""
+    r = _run(["free", "-m"])
+    for line in r.stdout.split("\n"):
+        if "Mem:" in line:
+            parts = line.split()
+            avail = int(parts[-1]) if len(parts) > 6 else 0
+            if avail < 500:
+                return True, "{}MB (WARN)".format(avail)
             return True, "{}MB".format(avail)
-    return True, "nao leu"
+    return True, "?"
 
 
 def check_ollama():
-    """ollama list -- 3 modelos (ERR)"""
+    """ollama list — 3 modelos (ERR)"""
     r = _run(["ollama", "list"])
     count = len([line for line in r.stdout.split("\n") if line.strip()]) - 1
     if count < 3:
         return False, "{} modelos".format(count)
     return True, "3 modelos"
+
+
+def check_search():
+    """Verifica se MCPs de busca estao disponiveis (ERR)"""
+    # Verifica se temos ao menos 1 MCP de search configurado
+    mcp_config = Path.home()/".hermes"/"mcp_servers.json"
+    has_search = False
+    if mcp_config.exists():
+        try:
+            configs = json.loads(mcp_config.read_text())
+            for name, cfg in configs.items():
+                if "search" in name.lower() or "ddg" in name.lower():
+                    has_search = True
+                    break
+        except Exception:
+            pass
+    # Fallback: verifica se o modulo Python existe
+    if not has_search:
+        try:
+            import urllib.request
+            urllib.request.urlopen("https://duckduckgo.com", timeout=3)
+            has_search = True
+        except Exception:
+            pass
+    if not has_search:
+        return False, "nenhum MCP de busca configurado"
+    return True, "search disponivel"
 
 
 def check_daemon():
@@ -182,16 +269,19 @@ def check_progress():
 
 
 CHECKS = [
-    ("R-USE:RAM",        check_ram),
-    ("R-USE:Ollama",     check_ollama),
-    ("R-USE:Daemon",     check_daemon),
-    ("R-USE:Thermal",    check_thermal),
-    ("R-3W",             check_3w),
-    ("R-ASCII",          check_ascii),
-    ("R-ENV",            check_env),
-    ("R-ORCHESTRATOR",   check_orchestrator),
-    ("R-SDD",            check_sdd),
-    ("R-PROGRESS",       check_progress),
+    ("R-USE:System",      check_use),
+    ("R-USE:RAM",         check_ram),
+    ("R-USE:Ollama",      check_ollama),
+    ("R-USE:Daemon",      check_daemon),
+    ("R-USE:Thermal",     check_thermal),
+    ("R-VALIDATE",        check_mirror),
+    ("R-SEARCH",          check_search),
+    ("R-3W",              check_3w),
+    ("R-ASCII",           check_ascii),
+    ("R-ENV",             check_env),
+    ("R-ORCHESTRATOR",    check_orchestrator),
+    ("R-SDD",             check_sdd),
+    ("R-PROGRESS",        check_progress),
 ]
 
 

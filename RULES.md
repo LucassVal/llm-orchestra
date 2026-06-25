@@ -29,6 +29,25 @@ Antes de qualquer acao no ecossistema bench-llm:
 
 **NUNCA sugerir ou executar sem verificar esses 5 pontos.**
 
+## R-BENCH-VALIDATE — Validar Espelhos
+
+Antes de todo commit:
+- `make rules` → R-VALIDATE verifica triade (Makefile ↔ maker ↔ ps1)
+- `make audit` → 1_triade check
+- Maker CLI deve ter 1:1 com Makefile
+- .ps1 deve ter 1:1 com Makefile
+
+**NUNCA commitar com triade dessincronizada.**
+
+## R-BENCH-SEARCH — Ferramentas de Busca
+
+- Pelo menos 1 MCP de busca deve estar configurado (ddg-search)
+- Fallback: acesso HTTP a duckduckgo.com
+- Ferramentas: `mcp_ddg_search_search`, `mcp_ows_search`, `web_search`
+- Todas open-source, zero APIs pagas
+
+**NUNCA depender de API paga para busca.**
+
 ## R-BENCH-3W — What, Why, When
 
 Toda nova funcionalidade, script ou alteracao responde:

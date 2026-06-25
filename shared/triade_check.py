@@ -8,7 +8,7 @@ BUILD = Path(__file__).parent.parent
 
 def _targets_makefile():
     text = (BUILD/"Makefile").read_text()
-    return set(re.findall(r'^([a-z][a-z-]*):.*##', text, re.M))
+    return set(re.findall(r'^([a-z][a-z0-9-]*):.*##', text, re.M))
 
 def _targets_maker():
     text = (BUILD.parent/"NeoCortex"/"maker"/"cmd_bench.py").read_text()

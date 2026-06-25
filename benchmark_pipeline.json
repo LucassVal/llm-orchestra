@@ -1,0 +1,1014 @@
+{
+  "run_id": "978405dd-f295-4927-ab26-3d0d8cc31ba8",
+  "mode": "pipeline",
+  "results": [
+    {
+      "model": "Qwen_Qwen3-4B-Q4_K_M",
+      "gb": 2.3,
+      "tests": {
+        "stress": {
+          "model": "Qwen_Qwen3-4B-Q4_K_M",
+          "gb": 2.3,
+          "phases": {
+            "COLD": {
+              "avg_tok_s": 13.8,
+              "avg_ttft_ms": 810.0,
+              "max_temp_c": 0,
+              "runs": 1,
+              "status": "OK"
+            },
+            "SUSTAINED": {
+              "avg_tok_s": 15.1,
+              "avg_ttft_ms": 8136.0,
+              "max_temp_c": 0,
+              "runs": 5,
+              "status": "OK"
+            },
+            "STRESS": {
+              "avg_tok_s": 16.8,
+              "avg_ttft_ms": 7145.0,
+              "max_temp_c": 0,
+              "runs": 1,
+              "status": "OK"
+            }
+          },
+          "status": "OK",
+          "child_elapsed_s": 0
+        },
+        "battery": {
+          "model": "Qwen_Qwen3-4B-Q4_K_M",
+          "gb": 2.3,
+          "status": "OK",
+          "summary": {
+            "total": 14,
+            "ok": 14,
+            "keyword_ok": 2,
+            "avg_tok_s": 16.8,
+            "avg_ttft_ms": 285.0,
+            "score": 2.0
+          },
+          "results": [
+            {
+              "run": 1,
+              "id": "C1",
+              "category": "codigo",
+              "tok_s": 18.0,
+              "ttft_ms": 328.0,
+              "keyword_ok": false,
+              "status": "OK",
+              "sample": "Okay, I need to write a Python function that sums all the even numbers in a list. Let's think about ",
+              "temp_c": 100,
+              "ram_mb": 7651,
+              "cpu_mhz": 2328.0
+            },
+            {
+              "run": 1,
+              "id": "C2",
+              "category": "codigo",
+              "tok_s": 18.0,
+              "ttft_ms": 240.0,
+              "keyword_ok": false,
+              "status": "OK",
+              "sample": "Okay, I need to write a Python function that checks if a string is a palindrome. Let me think about ",
+              "temp_c": 106,
+              "ram_mb": 7652,
+              "cpu_mhz": 2328.0
+            },
+            {
+              "run": 1,
+              "id": "C3",
+              "category": "codigo",
+              "tok_s": 17.4,
+              "ttft_ms": 257.0,
+              "keyword_ok": false,
+              "status": "OK",
+              "sample": "Okay, I need to write a Python function for binary search in a sorted list. Let me think about how b",
+              "temp_c": 108,
+              "ram_mb": 7573,
+              "cpu_mhz": 2170.0
+            },
+            {
+              "run": 1,
+              "id": "L1",
+              "category": "logica",
+              "tok_s": 18.3,
+              "ttft_ms": 663.0,
+              "keyword_ok": false,
+              "status": "OK",
+              "sample": "Okay, let's see. The problem is: If 5 machines make 5 parts in 5 minutes, how many parts do ",
+              "temp_c": 108,
+              "ram_mb": 7595,
+              "cpu_mhz": 2170.0
+            },
+            {
+              "run": 1,
+              "id": "L2",
+              "category": "logica",
+              "tok_s": 18.1,
+              "ttft_ms": 575.0,
+              "keyword_ok": false,
+              "status": "OK",
+              "sample": "Okay, let's see. I need to figure out the next number in the sequence: 2, 6, 12,",
+              "temp_c": 108,
+              "ram_mb": 7611,
+              "cpu_mhz": 2141.0
+            },
+            {
+              "run": 1,
+              "id": "T1",
+              "category": "traducao",
+              "tok_s": 18.0,
+              "ttft_ms": 353.0,
+              "keyword_ok": false,
+              "status": "OK",
+              "sample": "Okay, the user wants to translate the sentence \"The cat sleeps on the warm roof.\" into Portuguese. L",
+              "temp_c": 108,
+              "ram_mb": 7615,
+              "cpu_mhz": 2141.0
+            },
+            {
+              "run": 1,
+              "id": "I1",
+              "category": "instrucao",
+              "tok_s": 17.7,
+              "ttft_ms": 321.0,
+              "keyword_ok": true,
+              "status": "OK",
+              "sample": "Okay, the user is asking for three Brazilian fruits, and they just want the names, comma-separated. ",
+              "temp_c": 108,
+              "ram_mb": 7640,
+              "cpu_mhz": 2011.0
+            },
+            {
+              "run": 2,
+              "id": "C1",
+              "category": "codigo",
+              "tok_s": 16.6,
+              "ttft_ms": 382.0,
+              "keyword_ok": false,
+              "status": "OK",
+              "sample": "Okay, I need to write a Python function that sums all the even numbers in a list. Let's think about ",
+              "temp_c": 108,
+              "ram_mb": 7654,
+              "cpu_mhz": 2011.0
+            },
+            {
+              "run": 2,
+              "id": "C2",
+              "category": "codigo",
+              "tok_s": 14.4,
+              "ttft_ms": 299.0,
+              "keyword_ok": false,
+              "status": "OK",
+              "sample": "Okay, I need to write a Python function that checks if a string is a palindrome. Let me think about ",
+              "temp_c": 108,
+              "ram_mb": 7898,
+              "cpu_mhz": 2011.0
+            },
+            {
+              "run": 2,
+              "id": "C3",
+              "category": "codigo",
+              "tok_s": 15.9,
+              "ttft_ms": 311.0,
+              "keyword_ok": false,
+              "status": "OK",
+              "sample": "Okay, I need to write a Python function for binary search in a sorted list. Let me think about how b",
+              "temp_c": 108,
+              "ram_mb": 7855,
+              "cpu_mhz": 2011.0
+            },
+            {
+              "run": 2,
+              "id": "L1",
+              "category": "logica",
+              "tok_s": 15.7,
+              "ttft_ms": 64.0,
+              "keyword_ok": false,
+              "status": "OK",
+              "sample": "Okay, let's see. The problem is: If 5 machines make 5 parts in 5 minutes, how many parts do ",
+              "temp_c": 108,
+              "ram_mb": 7825,
+              "cpu_mhz": 1925.0
+            },
+            {
+              "run": 2,
+              "id": "L2",
+              "category": "logica",
+              "tok_s": 16.0,
+              "ttft_ms": 64.0,
+              "keyword_ok": false,
+              "status": "OK",
+              "sample": "Okay, let's see. I need to figure out the next number in the sequence: 2, 6, 12,",
+              "temp_c": 109,
+              "ram_mb": 7836,
+              "cpu_mhz": 2011.0
+            },
+            {
+              "run": 2,
+              "id": "T1",
+              "category": "traducao",
+              "tok_s": 14.5,
+              "ttft_ms": 68.0,
+              "keyword_ok": false,
+              "status": "OK",
+              "sample": "Okay, the user wants to translate the sentence \"The cat sleeps on the warm roof.\" into Portuguese. L",
+              "temp_c": 108,
+              "ram_mb": 7865,
+              "cpu_mhz": 1925.0
+            },
+            {
+              "run": 2,
+              "id": "I1",
+              "category": "instrucao",
+              "tok_s": 16.2,
+              "ttft_ms": 66.0,
+              "keyword_ok": true,
+              "status": "OK",
+              "sample": "Okay, the user is asking for three Brazilian fruits, and they just want the names, comma-separated. ",
+              "temp_c": 108,
+              "ram_mb": 7879,
+              "cpu_mhz": 2011.0
+            }
+          ]
+        },
+        "creative": {
+          "model": "Qwen_Qwen3-4B-Q4_K_M",
+          "gb": 2.3,
+          "status": "OK",
+          "summary": {
+            "0.1": {
+              "lexical_diversity": 0.77,
+              "repetition": 0.06,
+              "variance_runs": "4/4",
+              "factual_ok": "0/1"
+            },
+            "0.5": {
+              "lexical_diversity": 0.85,
+              "repetition": 0.01,
+              "variance_runs": "4/4",
+              "factual_ok": "1/1"
+            },
+            "0.7": {
+              "lexical_diversity": 0.71,
+              "repetition": 0.14,
+              "variance_runs": "4/4",
+              "factual_ok": "0/1"
+            },
+            "1.0": {
+              "lexical_diversity": 0.78,
+              "repetition": 0.08,
+              "variance_runs": "4/4",
+              "factual_ok": "0/1"
+            }
+          },
+          "results": [
+            {
+              "temp": 0.1,
+              "category": "haiku",
+              "tok_s": 8.9,
+              "lexical_diversity": 0.92,
+              "repetition": 0.02,
+              "variance": 1,
+              "length": 283,
+              "sample": "  /  / Código em branco,   / pensamento em ação,   / lógica se forma"
+            },
+            {
+              "temp": 0.1,
+              "category": "historia",
+              "tok_s": 7.2,
+              "lexical_diversity": 0.93,
+              "repetition": 0.0,
+              "variance": 1,
+              "length": 275,
+              "sample": "  /  / **Resposta:** / O robô, após anos de programação, descobriu"
+            },
+            {
+              "temp": 0.1,
+              "category": "poesia",
+              "tok_s": 6.8,
+              "lexical_diversity": 0.68,
+              "repetition": 0.22,
+              "variance": 1,
+              "length": 225,
+              "sample": "  /  / **Sobre o céu noturno**   / O céu, em sua infinita quietude"
+            },
+            {
+              "temp": 0.1,
+              "category": "factual",
+              "tok_s": 0.9,
+              "lexical_diversity": 0.55,
+              "repetition": 0.0,
+              "variance": 1,
+              "length": 158,
+              "sample": " 1 palavra. 1 letra. 1 sílaba. 1 vogal. 1 consoante. 1 dígra"
+            },
+            {
+              "temp": 0.5,
+              "category": "haiku",
+              "tok_s": 0.9,
+              "lexical_diversity": 0.87,
+              "repetition": 0.03,
+              "variance": 1,
+              "length": 237,
+              "sample": " 5-7-5. /  / Sim, um haiku é uma poesia japonesa com três linhas"
+            },
+            {
+              "temp": 0.5,
+              "category": "historia",
+              "tok_s": 1.3,
+              "lexical_diversity": 0.87,
+              "repetition": 0.0,
+              "variance": 1,
+              "length": 292,
+              "sample": " ** /  / **Resposta:** /  / O robô, dotado de uma inteligência artif"
+            },
+            {
+              "temp": 0.5,
+              "category": "poesia",
+              "tok_s": 1.0,
+              "lexical_diversity": 0.88,
+              "repetition": 0.0,
+              "variance": 1,
+              "length": 239,
+              "sample": "  /  / **Sobre o céu noturno:** /  / A noite se desenha em tons de p"
+            },
+            {
+              "temp": 0.5,
+              "category": "factual",
+              "tok_s": 8.2,
+              "lexical_diversity": 0.77,
+              "repetition": 0.0,
+              "variance": 1,
+              "length": 302,
+              "sample": " 1 resposta. /  / A capital do Brasil é Brasília.   / **Resposta:*"
+            },
+            {
+              "temp": 0.7,
+              "category": "haiku",
+              "tok_s": 1.5,
+              "lexical_diversity": 0.91,
+              "repetition": 0.02,
+              "variance": 1,
+              "length": 337,
+              "sample": " Traducao para ingles. / Okay, the user wants a haiku about pr"
+            },
+            {
+              "temp": 0.7,
+              "category": "historia",
+              "tok_s": 2.0,
+              "lexical_diversity": 0.88,
+              "repetition": 0.0,
+              "variance": 1,
+              "length": 296,
+              "sample": " ** /  / **Resposta:** /  / O robô, após anos de estudos, finalmente"
+            },
+            {
+              "temp": 0.7,
+              "category": "poesia",
+              "tok_s": 8.4,
+              "lexical_diversity": 0.77,
+              "repetition": 0.05,
+              "variance": 1,
+              "length": 233,
+              "sample": "  /  / **Sobre o céu noturno**   / A noite canta com estrelas que "
+            },
+            {
+              "temp": 0.7,
+              "category": "factual",
+              "tok_s": 6.9,
+              "lexical_diversity": 0.3,
+              "repetition": 0.48,
+              "variance": 1,
+              "length": 166,
+              "sample": " 1 palavra. 1 sílaba. 1 vogal. 1 consoante. 1 letra. 1 letra"
+            },
+            {
+              "temp": 1.0,
+              "category": "haiku",
+              "tok_s": 8.4,
+              "lexical_diversity": 0.79,
+              "repetition": 0.05,
+              "variance": 1,
+              "length": 229,
+              "sample": " 5-7-5 sílabas. /  / Vamos ver, o haiku precisa ter 5-7-5 sílaba"
+            },
+            {
+              "temp": 1.0,
+              "category": "historia",
+              "tok_s": 8.9,
+              "lexical_diversity": 0.93,
+              "repetition": 0.0,
+              "variance": 1,
+              "length": 268,
+              "sample": "  /  / O robô, após horas de estudo, finalmente aprendeu a sonha"
+            },
+            {
+              "temp": 1.0,
+              "category": "poesia",
+              "tok_s": 8.3,
+              "lexical_diversity": 0.85,
+              "repetition": 0.0,
+              "variance": 1,
+              "length": 229,
+              "sample": " **   / **   / Sobre a noite, o céu doura e brilha com estrelas,"
+            },
+            {
+              "temp": 1.0,
+              "category": "factual",
+              "tok_s": 8.8,
+              "lexical_diversity": 0.53,
+              "repetition": 0.26,
+              "variance": 1,
+              "length": 233,
+              "sample": " 2 frases. 3 frases. 4 frases. 5 frases. 6 frases. 7 frases."
+            }
+          ]
+        },
+        "ppl": {
+          "model_name": "Qwen_Qwen3-4B-Q4_K_M",
+          "ppl": 1.01,
+          "avg_logprob": -0.0102,
+          "total_tokens": 50,
+          "sentences_tested": 10,
+          "sentences_failed": 0,
+          "elapsed_s": 11.3,
+          "trace_id": "97b2de55-92a1-4cf1-9480-efab29c1c0e6",
+          "details": [
+            {
+              "sentence": "O presidente anunciou novas medidas econômicas durante entrevista coletiva.",
+              "tokens": 5,
+              "avg_logprob": -0.0052
+            },
+            {
+              "sentence": "A temperatura máxima hoje deve chegar a trinta e cinco graus na capital.",
+              "tokens": 5,
+              "avg_logprob": -0.0076
+            },
+            {
+              "sentence": "Cientistas descobriram uma nova espécie de planta na Amazônia.",
+              "tokens": 5,
+              "avg_logprob": -0.0056
+            },
+            {
+              "sentence": "O mercado financeiro fechou em alta após divulgação de dados de emprego.",
+              "tokens": 5,
+              "avg_logprob": -0.0041
+            },
+            {
+              "sentence": "As chuvas causaram alagamentos em várias regiões da cidade ontem.",
+              "tokens": 5,
+              "avg_logprob": -0.0031
+            },
+            {
+              "sentence": "A função recursiva deve ter um caso base para evitar loop infinito.",
+              "tokens": 5,
+              "avg_logprob": -0.0122
+            },
+            {
+              "sentence": "O banco de dados utiliza índices para acelerar consultas complexas.",
+              "tokens": 5,
+              "avg_logprob": -0.0024
+            },
+            {
+              "sentence": "Python é uma linguagem interpretada com tipagem dinâmica e forte.",
+              "tokens": 5,
+              "avg_logprob": -0.0027
+            },
+            {
+              "sentence": "O algoritmo de ordenação quicksort tem complexidade média n log n.",
+              "tokens": 5,
+              "avg_logprob": -0.0524
+            },
+            {
+              "sentence": "A memória cache armazena dados frequentemente acessados pelo processador.",
+              "tokens": 5,
+              "avg_logprob": -0.0073
+            }
+          ]
+        },
+        "analyze": {
+          "model": "Qwen_Qwen3-4B-Q4_K_M",
+          "gb": 2.3,
+          "status": "OK",
+          "runs": 3,
+          "analysis": {
+            "rca": {
+              "temp_avg_c": 104.0,
+              "tok_s_avg": 17.0,
+              "temp_max_c": 105,
+              "tok_s_min": 16.3,
+              "swap_avg_mb": -0.0,
+              "swap_max_mb": 0,
+              "temp_tok_correlation": "negativa"
+            },
+            "pareto": [
+              {
+                "rank": 1,
+                "factor": "tok/s generation",
+                "impact": "40%",
+                "note": "métrica principal"
+              },
+              {
+                "rank": 2,
+                "factor": "RAM/swap pressure",
+                "impact": "25%",
+                "note": "memória"
+              },
+              {
+                "rank": 3,
+                "factor": "Thermal throttle",
+                "impact": "20%",
+                "note": "temperatura"
+              },
+              {
+                "rank": 4,
+                "factor": "Model architecture",
+                "impact": "10%",
+                "note": "tamanho/quantização"
+              },
+              {
+                "rank": 5,
+                "factor": "TTFT latency",
+                "impact": "5%",
+                "note": "prompt processing"
+              }
+            ]
+          },
+          "results": [
+            {
+              "run": 1,
+              "category": "conhecimento",
+              "status": "OK",
+              "gen_tok_s": 17.3,
+              "prompt_tok_s": 48.9,
+              "ttft_ms": 368.3,
+              "tokens": 25,
+              "sys_after": {
+                "ram": {
+                  "total_mb": 11238,
+                  "avail_mb": 2315,
+                  "used_mb": 8923,
+                  "used_pct": 79.4
+                },
+                "swap": {
+                  "total_mb": 8428,
+                  "used_mb": 2751,
+                  "used_pct": 32.6
+                },
+                "thermal": {
+                  "cpullc-0-0": 94,
+                  "cpullc-0-1": 97,
+                  "qmx-0-0": 87,
+                  "qmx-0-1": 89,
+                  "qmx-0-2": 88,
+                  "cpu-0-0-0": 97,
+                  "cpu-0-0-1": 99,
+                  "cpu-0-1-0": 92,
+                  "cpu-0-1-1": 93,
+                  "cpu-0-2-0": 98,
+                  "cpu-0-2-1": 100,
+                  "cpu-0-3-0": 91,
+                  "cpu-0-3-1": 91,
+                  "cpu-0-4-0": 96,
+                  "cpu-0-4-1": 98,
+                  "cpu-0-5-0": 91,
+                  "cpu-0-5-1": 92,
+                  "cpullc-1-0": 102,
+                  "cpullc-1-1": 98,
+                  "qmx-1-0": 103
+                },
+                "delta": {
+                  "elapsed_s": 1.8,
+                  "ram_delta_mb": 11,
+                  "swap_delta_mb": 0,
+                  "cpu_max_mhz": 1901.0,
+                  "cpu_avg_mhz": 1891.0,
+                  "max_temp_c": 103
+                }
+              }
+            },
+            {
+              "run": 1,
+              "category": "logica",
+              "status": "OK",
+              "gen_tok_s": 17.1,
+              "prompt_tok_s": 56.6,
+              "ttft_ms": 794.5,
+              "tokens": 25,
+              "sys_after": {
+                "ram": {
+                  "total_mb": 11238,
+                  "avail_mb": 2310,
+                  "used_mb": 8928,
+                  "used_pct": 79.4
+                },
+                "swap": {
+                  "total_mb": 8428,
+                  "used_mb": 2749,
+                  "used_pct": 32.6
+                },
+                "thermal": {
+                  "cpullc-0-0": 96,
+                  "cpullc-0-1": 98,
+                  "qmx-0-0": 88,
+                  "qmx-0-1": 90,
+                  "qmx-0-2": 88,
+                  "cpu-0-0-0": 97,
+                  "cpu-0-0-1": 99,
+                  "cpu-0-1-0": 95,
+                  "cpu-0-1-1": 95,
+                  "cpu-0-2-0": 99,
+                  "cpu-0-2-1": 102,
+                  "cpu-0-3-0": 93,
+                  "cpu-0-3-1": 94,
+                  "cpu-0-4-0": 95,
+                  "cpu-0-4-1": 95,
+                  "cpu-0-5-0": 92,
+                  "cpu-0-5-1": 94,
+                  "cpullc-1-0": 102,
+                  "cpullc-1-1": 99,
+                  "qmx-1-0": 104
+                },
+                "delta": {
+                  "elapsed_s": 2.3,
+                  "ram_delta_mb": 5,
+                  "swap_delta_mb": -2,
+                  "cpu_max_mhz": 1901.0,
+                  "cpu_avg_mhz": 1891.0,
+                  "max_temp_c": 104
+                }
+              }
+            },
+            {
+              "run": 1,
+              "category": "codigo",
+              "status": "OK",
+              "gen_tok_s": 17.2,
+              "prompt_tok_s": 48.1,
+              "ttft_ms": 395.2,
+              "tokens": 25,
+              "sys_after": {
+                "ram": {
+                  "total_mb": 11238,
+                  "avail_mb": 2295,
+                  "used_mb": 8943,
+                  "used_pct": 79.6
+                },
+                "swap": {
+                  "total_mb": 8428,
+                  "used_mb": 2748,
+                  "used_pct": 32.6
+                },
+                "thermal": {
+                  "cpullc-0-0": 96,
+                  "cpullc-0-1": 100,
+                  "qmx-0-0": 89,
+                  "qmx-0-1": 91,
+                  "qmx-0-2": 89,
+                  "cpu-0-0-0": 99,
+                  "cpu-0-0-1": 102,
+                  "cpu-0-1-0": 95,
+                  "cpu-0-1-1": 94,
+                  "cpu-0-2-0": 100,
+                  "cpu-0-2-1": 103,
+                  "cpu-0-3-0": 93,
+                  "cpu-0-3-1": 95,
+                  "cpu-0-4-0": 96,
+                  "cpu-0-4-1": 98,
+                  "cpu-0-5-0": 93,
+                  "cpu-0-5-1": 94,
+                  "cpullc-1-0": 103,
+                  "cpullc-1-1": 100,
+                  "qmx-1-0": 105
+                },
+                "delta": {
+                  "elapsed_s": 1.9,
+                  "ram_delta_mb": 15,
+                  "swap_delta_mb": -1,
+                  "cpu_max_mhz": 1901.0,
+                  "cpu_avg_mhz": 1891.0,
+                  "max_temp_c": 105
+                }
+              }
+            },
+            {
+              "run": 2,
+              "category": "conhecimento",
+              "status": "OK",
+              "gen_tok_s": 16.8,
+              "prompt_tok_s": 15.4,
+              "ttft_ms": 65.1,
+              "tokens": 25,
+              "sys_after": {
+                "ram": {
+                  "total_mb": 11238,
+                  "avail_mb": 2283,
+                  "used_mb": 8955,
+                  "used_pct": 79.7
+                },
+                "swap": {
+                  "total_mb": 8428,
+                  "used_mb": 2748,
+                  "used_pct": 32.6
+                },
+                "thermal": {
+                  "cpullc-0-0": 95,
+                  "cpullc-0-1": 98,
+                  "qmx-0-0": 89,
+                  "qmx-0-1": 90,
+                  "qmx-0-2": 89,
+                  "cpu-0-0-0": 98,
+                  "cpu-0-0-1": 100,
+                  "cpu-0-1-0": 93,
+                  "cpu-0-1-1": 93,
+                  "cpu-0-2-0": 99,
+                  "cpu-0-2-1": 102,
+                  "cpu-0-3-0": 93,
+                  "cpu-0-3-1": 93,
+                  "cpu-0-4-0": 96,
+                  "cpu-0-4-1": 96,
+                  "cpu-0-5-0": 92,
+                  "cpu-0-5-1": 93,
+                  "cpullc-1-0": 102,
+                  "cpullc-1-1": 98,
+                  "qmx-1-0": 103
+                },
+                "delta": {
+                  "elapsed_s": 1.6,
+                  "ram_delta_mb": 12,
+                  "swap_delta_mb": 0,
+                  "cpu_max_mhz": 1747.0,
+                  "cpu_avg_mhz": 1723.0,
+                  "max_temp_c": 103
+                }
+              }
+            },
+            {
+              "run": 2,
+              "category": "logica",
+              "status": "OK",
+              "gen_tok_s": 17.2,
+              "prompt_tok_s": 15.1,
+              "ttft_ms": 66.2,
+              "tokens": 25,
+              "sys_after": {
+                "ram": {
+                  "total_mb": 11238,
+                  "avail_mb": 2290,
+                  "used_mb": 8948,
+                  "used_pct": 79.6
+                },
+                "swap": {
+                  "total_mb": 8428,
+                  "used_mb": 2748,
+                  "used_pct": 32.6
+                },
+                "thermal": {
+                  "cpullc-0-0": 95,
+                  "cpullc-0-1": 98,
+                  "qmx-0-0": 89,
+                  "qmx-0-1": 91,
+                  "qmx-0-2": 89,
+                  "cpu-0-0-0": 98,
+                  "cpu-0-0-1": 100,
+                  "cpu-0-1-0": 94,
+                  "cpu-0-1-1": 95,
+                  "cpu-0-2-0": 99,
+                  "cpu-0-2-1": 102,
+                  "cpu-0-3-0": 92,
+                  "cpu-0-3-1": 94,
+                  "cpu-0-4-0": 95,
+                  "cpu-0-4-1": 97,
+                  "cpu-0-5-0": 91,
+                  "cpu-0-5-1": 93,
+                  "cpullc-1-0": 102,
+                  "cpullc-1-1": 98,
+                  "qmx-1-0": 103
+                },
+                "delta": {
+                  "elapsed_s": 1.5,
+                  "ram_delta_mb": -7,
+                  "swap_delta_mb": 0,
+                  "cpu_max_mhz": 1747.0,
+                  "cpu_avg_mhz": 1723.0,
+                  "max_temp_c": 103
+                }
+              }
+            },
+            {
+              "run": 2,
+              "category": "codigo",
+              "status": "OK",
+              "gen_tok_s": 16.9,
+              "prompt_tok_s": 15.3,
+              "ttft_ms": 65.4,
+              "tokens": 25,
+              "sys_after": {
+                "ram": {
+                  "total_mb": 11238,
+                  "avail_mb": 2283,
+                  "used_mb": 8955,
+                  "used_pct": 79.7
+                },
+                "swap": {
+                  "total_mb": 8428,
+                  "used_mb": 2748,
+                  "used_pct": 32.6
+                },
+                "thermal": {
+                  "cpullc-0-0": 96,
+                  "cpullc-0-1": 98,
+                  "qmx-0-0": 88,
+                  "qmx-0-1": 90,
+                  "qmx-0-2": 89,
+                  "cpu-0-0-0": 98,
+                  "cpu-0-0-1": 100,
+                  "cpu-0-1-0": 95,
+                  "cpu-0-1-1": 95,
+                  "cpu-0-2-0": 99,
+                  "cpu-0-2-1": 102,
+                  "cpu-0-3-0": 91,
+                  "cpu-0-3-1": 91,
+                  "cpu-0-4-0": 95,
+                  "cpu-0-4-1": 97,
+                  "cpu-0-5-0": 92,
+                  "cpu-0-5-1": 94,
+                  "cpullc-1-0": 102,
+                  "cpullc-1-1": 99,
+                  "qmx-1-0": 103
+                },
+                "delta": {
+                  "elapsed_s": 1.6,
+                  "ram_delta_mb": 7,
+                  "swap_delta_mb": 0,
+                  "cpu_max_mhz": 1747.0,
+                  "cpu_avg_mhz": 1723.0,
+                  "max_temp_c": 103
+                }
+              }
+            },
+            {
+              "run": 3,
+              "category": "conhecimento",
+              "status": "OK",
+              "gen_tok_s": 17.1,
+              "prompt_tok_s": 15.2,
+              "ttft_ms": 66.0,
+              "tokens": 25,
+              "sys_after": {
+                "ram": {
+                  "total_mb": 11238,
+                  "avail_mb": 2284,
+                  "used_mb": 8954,
+                  "used_pct": 79.7
+                },
+                "swap": {
+                  "total_mb": 8428,
+                  "used_mb": 2748,
+                  "used_pct": 32.6
+                },
+                "thermal": {
+                  "cpullc-0-0": 95,
+                  "cpullc-0-1": 99,
+                  "qmx-0-0": 89,
+                  "qmx-0-1": 91,
+                  "qmx-0-2": 89,
+                  "cpu-0-0-0": 100,
+                  "cpu-0-0-1": 102,
+                  "cpu-0-1-0": 93,
+                  "cpu-0-1-1": 93,
+                  "cpu-0-2-0": 99,
+                  "cpu-0-2-1": 102,
+                  "cpu-0-3-0": 92,
+                  "cpu-0-3-1": 92,
+                  "cpu-0-4-0": 96,
+                  "cpu-0-4-1": 99,
+                  "cpu-0-5-0": 90,
+                  "cpu-0-5-1": 90,
+                  "cpullc-1-0": 102,
+                  "cpullc-1-1": 99,
+                  "qmx-1-0": 103
+                },
+                "delta": {
+                  "elapsed_s": 1.6,
+                  "ram_delta_mb": -1,
+                  "swap_delta_mb": 0,
+                  "cpu_max_mhz": 1747.0,
+                  "cpu_avg_mhz": 1723.0,
+                  "max_temp_c": 103
+                }
+              }
+            },
+            {
+              "run": 3,
+              "category": "logica",
+              "status": "OK",
+              "gen_tok_s": 16.3,
+              "prompt_tok_s": 14.2,
+              "ttft_ms": 70.3,
+              "tokens": 25,
+              "sys_after": {
+                "ram": {
+                  "total_mb": 11238,
+                  "avail_mb": 2292,
+                  "used_mb": 8946,
+                  "used_pct": 79.6
+                },
+                "swap": {
+                  "total_mb": 8428,
+                  "used_mb": 2748,
+                  "used_pct": 32.6
+                },
+                "thermal": {
+                  "cpullc-0-0": 96,
+                  "cpullc-0-1": 100,
+                  "qmx-0-0": 89,
+                  "qmx-0-1": 91,
+                  "qmx-0-2": 90,
+                  "cpu-0-0-0": 100,
+                  "cpu-0-0-1": 102,
+                  "cpu-0-1-0": 93,
+                  "cpu-0-1-1": 94,
+                  "cpu-0-2-0": 100,
+                  "cpu-0-2-1": 103,
+                  "cpu-0-3-0": 92,
+                  "cpu-0-3-1": 93,
+                  "cpu-0-4-0": 97,
+                  "cpu-0-4-1": 99,
+                  "cpu-0-5-0": 91,
+                  "cpu-0-5-1": 91,
+                  "cpullc-1-0": 103,
+                  "cpullc-1-1": 100,
+                  "qmx-1-0": 104
+                },
+                "delta": {
+                  "elapsed_s": 1.6,
+                  "ram_delta_mb": -8,
+                  "swap_delta_mb": 0,
+                  "cpu_max_mhz": 1747.0,
+                  "cpu_avg_mhz": 1723.0,
+                  "max_temp_c": 104
+                }
+              }
+            },
+            {
+              "run": 3,
+              "category": "codigo",
+              "status": "OK",
+              "gen_tok_s": 16.9,
+              "prompt_tok_s": 14.7,
+              "ttft_ms": 67.8,
+              "tokens": 25,
+              "sys_after": {
+                "ram": {
+                  "total_mb": 11238,
+                  "avail_mb": 2281,
+                  "used_mb": 8957,
+                  "used_pct": 79.7
+                },
+                "swap": {
+                  "total_mb": 8428,
+                  "used_mb": 2748,
+                  "used_pct": 32.6
+                },
+                "thermal": {
+                  "cpullc-0-0": 95,
+                  "cpullc-0-1": 100,
+                  "qmx-0-0": 89,
+                  "qmx-0-1": 91,
+                  "qmx-0-2": 89,
+                  "cpu-0-0-0": 100,
+                  "cpu-0-0-1": 103,
+                  "cpu-0-1-0": 93,
+                  "cpu-0-1-1": 93,
+                  "cpu-0-2-0": 100,
+                  "cpu-0-2-1": 103,
+                  "cpu-0-3-0": 91,
+                  "cpu-0-3-1": 92,
+                  "cpu-0-4-0": 97,
+                  "cpu-0-4-1": 100,
+                  "cpu-0-5-0": 91,
+                  "cpu-0-5-1": 91,
+                  "cpullc-1-0": 103,
+                  "cpullc-1-1": 100,
+                  "qmx-1-0": 104
+                },
+                "delta": {
+                  "elapsed_s": 1.6,
+                  "ram_delta_mb": 11,
+                  "swap_delta_mb": 0,
+                  "cpu_max_mhz": 1747.0,
+                  "cpu_avg_mhz": 1723.0,
+                  "max_temp_c": 104
+                }
+              }
+            }
+          ]
+        }
+      },
+      "ram_delta_mb": 282
+    }
+  ],
+  "timestamp": "2026-06-25T17:08:50.344236"
+}

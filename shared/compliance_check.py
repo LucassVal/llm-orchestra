@@ -121,14 +121,18 @@ def run():
 
     # ═══ 6d. PYTEST ═══
     r = subprocess.run(
-        ["pytest", str(BUILD), "--co", "-q"],
+        ["pytest", str(BUILD/"tests"), "--co", "-q"],
         capture_output=True, text=True,
     )
     pytest_ok = r.returncode == 0
     n_tests = "?"
-    for line in r.stdout.split("\n"):
-        if "test" in line.lower() and "selected" in line.lower():
+    for line in (r.stdout + r.stderr).split("\n"):
+        if "test" in line.lower() and ("collected" in line.lower() or "selected" in line.lower()):
             n_tests = line.strip()
+            break
+        if "no tests" in line.lower():
+            n_tests = "0 tests"
+            break
     results["6d_pytest"] = {
         "status": "PASS" if pytest_ok else "WARN",
         "detail": n_tests[:60],
@@ -191,14 +195,13 @@ def run():
     # ═══ 10. ORPHAN FILES ═══
     orphans = []
     root_allowed = {
-        "Makefile", "nc.ps1", "pyproject.toml", "RULES.md",
+        "Makefile", "nc.ps1", "pyproject.toml", "RULES.md", "README.md", ".gitignore",
         "meta_orchestrator.py", "bench_orchestrator.py",
         "bench_analyze.py", "bench_battery.py", "bench_child.py",
         "bench_creative.py", "bench_ppl.py", "bench_sweep.py",
         "bench_sys.py", "bench_temp_sweep.py",
         "Qwen_Qwen3-4B-Q4_K_M.gguf",
-        "benchmark_pipeline.json",  # output ativo
-        "bench_status.json",        # output ativo
+        "benchmark_pipeline.json", "bench_status.json",
         ".metrics_daemon.pid", ".env", ".env.make",
     }
     for f in BUILD.iterdir():
@@ -222,6 +225,27 @@ def run():
         }
     else:
         results["11_skills"] = {"status": "WARN", "detail": "skills_dir_ausente"}
+
+    # ═══ 12. MAKER CLI ═══
+    maker_file = Path.home()/"NeoCortex"/"maker"/"cmd_bench.py"
+    if maker_file.exists():
+        results["12_maker"] = {
+            "status": "PASS",
+            "detail": "cmd_bench.py presente",
+        }
+    else:
+        results["12_maker"] = {"status": "FAIL", "detail": "ausente"}
+
+    # ═══ 13. AGENTS ═══
+    agents_dir = Path.home()/"agents"
+    if agents_dir.exists():
+        contracts = list(agents_dir.glob("*.json"))
+        results["13_agents"] = {
+            "status": "PASS" if contracts else "WARN",
+            "detail": "{} contratos".format(len(contracts)),
+        }
+    else:
+        results["13_agents"] = {"status": "FAIL", "detail": "ausente"}
 
     # ═══ TABELA ═══
     print("COMPLIANCE AUDIT v2 — " + tstamp)

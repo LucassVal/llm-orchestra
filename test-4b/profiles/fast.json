@@ -1,0 +1,16 @@
+{
+  "_schema": "llm_profile_v1",
+  "model": "qwen3:4b",
+  "profile": "fast",
+  "description": "Perfil ultra-rapido — minima latencia, respostas curtas. Ideal para healthchecks e pings.",
+  "params": {
+    "temperature": 0.0,
+    "max_tokens": 64,
+    "ctx_size": 512,
+    "threads": 6,
+    "batch_size": 256,
+    "flash_attn": false,
+    "ngl": 0
+  },
+  "use_cases": ["healthcheck", "ping", "classificacao", "validacao"]
+}

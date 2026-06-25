@@ -1,0 +1,16 @@
+{
+  "_schema": "llm_profile_v1",
+  "model": "gemma4:e4b",
+  "profile": "chain_of_thought",
+  "description": "Perfil para raciocinio profundo — chain-of-thought, alta temperatura. Cerebro orquestrador.",
+  "params": {
+    "temperature": 0.5,
+    "max_tokens": 512,
+    "ctx_size": 4096,
+    "threads": 6,
+    "batch_size": 256,
+    "flash_attn": false,
+    "ngl": 0
+  },
+  "use_cases": ["chain_of_thought", "planejamento", "decisao", "analise_complexa"]
+}

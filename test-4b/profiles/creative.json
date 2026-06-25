@@ -1,0 +1,16 @@
+{
+  "_schema": "llm_profile_v1",
+  "model": "qwen3:4b",
+  "profile": "creative",
+  "description": "Perfil criativo — alta temperatura, tokens longos, diversidade lexical",
+  "params": {
+    "temperature": 0.7,
+    "max_tokens": 512,
+    "ctx_size": 2048,
+    "threads": 6,
+    "batch_size": 256,
+    "flash_attn": false,
+    "ngl": 0
+  },
+  "use_cases": ["criativo", "storytelling", "brainstorm", "poesia"]
+}

@@ -1,0 +1,16 @@
+{
+  "_schema": "llm_profile_v1",
+  "model": "qwen2.5-coder",
+  "profile": "agent_default",
+  "description": "Perfil equilibrado para tarefas gerais do worker pesado",
+  "params": {
+    "temperature": 0.3,
+    "max_tokens": 256,
+    "ctx_size": 2048,
+    "threads": 6,
+    "batch_size": 256,
+    "flash_attn": false,
+    "ngl": 0
+  },
+  "use_cases": ["agente_pesado", "analise", "debug_moderado"]
+}

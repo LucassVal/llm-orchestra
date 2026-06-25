@@ -1,0 +1,11 @@
+[tool.ruff]
+# Bench-LLM — regras de lint (25 Jun 2026)
+
+[tool.ruff.lint]
+select = ["E", "F", "SIM"]
+ignore = ["E402", "F403", "F405", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/orchestrator.py" = ["T201"]
+"**/bench_*.py" = ["T201"]
+"**/meta_orchestrator.py" = ["T201"]

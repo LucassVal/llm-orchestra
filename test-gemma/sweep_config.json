@@ -1,0 +1,59 @@
+{
+  "model": "gemma4:e4b",
+  "description": "Sweep de otimizacao — gemma4:e4b (9.6GB) via Ollama no Snapdragon 8 Gen 5. Orquestrador/cerebro para chain-of-thought.",
+  "baseline": {
+    "threads": 6,
+    "batch_size": 256,
+    "ctx_size": 512,
+    "flash_attn": false,
+    "ngl": 0,
+    "mlock": false,
+    "tok_s": null,
+    "note": "Gemma usa Ollama, nao recompilado. Parametros via ollama run."
+  },
+  "sweeps": [
+    {
+      "name": "threads",
+      "param": "--threads",
+      "values": [6, 8],
+      "type": "int",
+      "note": "Snapdragon 8 Gen 5. Ollama respeita --threads."
+    },
+    {
+      "name": "batch_size",
+      "param": "--batch-size",
+      "values": [256],
+      "type": "int",
+      "note": "Ollama ignora batch customizado. Fixo em 256."
+    },
+    {
+      "name": "flash_attn",
+      "param": "--flash-attn",
+      "values": ["off"],
+      "type": "bool",
+      "note": "Nao suportado no Ollama. Fixo em off."
+    },
+    {
+      "name": "ngl",
+      "param": "--n-gpu-layers",
+      "values": [0, 10],
+      "type": "int",
+      "note": "Vulkan via Ollama. 10 = sweet spot. 9.6GB pode saturar GPU."
+    },
+    {
+      "name": "mlock",
+      "param": "--mlock",
+      "values": ["off"],
+      "type": "bool",
+      "note": "9.6GB — mlock=on travaria RAM demais. Nao recomendado."
+    }
+  ],
+  "test_prompts": [
+    {"id": "fast", "text": "Responda apenas: OK", "max_tokens": 5},
+    {"id": "code", "text": "Write a Python function that sums even numbers in a list. Code only.", "max_tokens": 80},
+    {"id": "long", "text": "Explain how a CPU executes a program step by step.", "max_tokens": 150}
+  ],
+  "warmup_runs": 1,
+  "measure_runs": 2,
+  "ollama": true
+}

@@ -1,0 +1,57 @@
+{
+  "model": "qwen2.5-coder",
+  "description": "Sweep de otimizacao — qwen2.5-coder (4.7GB) no Snapdragon 8 Gen 5. Worker pesado para codigo/debug.",
+  "baseline": {
+    "threads": 6,
+    "batch_size": 256,
+    "ctx_size": 512,
+    "flash_attn": false,
+    "ngl": 0,
+    "mlock": false,
+    "tok_s": null
+  },
+  "sweeps": [
+    {
+      "name": "threads",
+      "param": "--threads",
+      "values": [6, 8],
+      "type": "int",
+      "note": "Snapdragon 8 Gen 5: 1 prime + 5 perf + 2 efficiency"
+    },
+    {
+      "name": "batch_size",
+      "param": "--batch-size",
+      "values": [256, 512],
+      "type": "int",
+      "note": "4.7GB — lotes grandes podem estourar RAM. 1024 nao testado."
+    },
+    {
+      "name": "flash_attn",
+      "param": "--flash-attn",
+      "values": ["off", "on"],
+      "type": "bool",
+      "note": "Flash Attention reduz uso de RAM no KV cache"
+    },
+    {
+      "name": "ngl",
+      "param": "--n-gpu-layers",
+      "values": [0, 5, 10],
+      "type": "int",
+      "note": "GPU Vulkan offload. 10 = sweet spot, 99 = gargalo"
+    },
+    {
+      "name": "mlock",
+      "param": "--mlock",
+      "values": ["off", "on"],
+      "type": "bool",
+      "note": "Trava modelo na RAM fisica. 4.7GB + sistema = cuidado com OOM."
+    }
+  ],
+  "test_prompts": [
+    {"id": "fast", "text": "Responda apenas: OK", "max_tokens": 5},
+    {"id": "code", "text": "Write a Python function that sums even numbers in a list. Code only.", "max_tokens": 80},
+    {"id": "long", "text": "Explain how a CPU executes a program step by step.", "max_tokens": 150}
+  ],
+  "warmup_runs": 1,
+  "measure_runs": 2
+}

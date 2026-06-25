@@ -1,0 +1,109 @@
+{
+  "_schema": "agent_contract_v1",
+  "_description": "Contrato canonico de definicao de agente. A fabrica le este JSON e gera o agente completo.",
+  "_sections": {
+    "1_profile": "perfil duro — modelo, temp, tokens, contexto",
+    "2_personality": "personalidade — system prompt, tom, idioma",
+    "3_function": "funcao — proposito, dominio, tarefas",
+    "4_limits": "limites operacionais — max turns, timeout, rate",
+    "5_sources": "fontes da verdade — RULES, docs, vault, APIs",
+    "6_tools": "ferramentas permitidas — whitelist de toolsets",
+    "7_memory": "memoria — o que persiste entre sessoes",
+    "8_skills": "skills — pre-carregadas na sessao",
+    "9_delegation": "delegacao — pode spawnar sub-agentes?",
+    "10_fallback": "fallback — o que fazer em falha",
+    "11_cron": "cron jobs — tarefas agendadas do agente"
+  },
+
+  "agent_id": "worker-4b-default",
+  "display_name": "Worker 4B Default",
+
+  "1_profile": {
+    "model": "qwen3:4b",
+    "profile_ref": "test-4b/profiles/agent_default.json",
+    "_profiles_available": {
+      "agent_default": "equilibrado — agentes e tarefas gerais",
+      "code": "deterministico — geracao de codigo",
+      "creative": "alta temp — brainstorming e criatividade",
+      "fast": "ultra-rapido — healthchecks e validacao"
+    }
+  },
+
+  "2_personality": {
+    "system_prompt": "Voce e um agente executor de tarefas locais. Seja direto, conciso e pragmatico. Responda em pt-BR. Prefira acao a descricao. Use ferramentas disponiveis sem hesitar.",
+    "tone": "profissional_direto",
+    "language": "pt-BR",
+    "style": "curto, sem markdown, foco em resultado",
+    "forbidden": ["excuses", "excessive_planning", "vague_promises"]
+  },
+
+  "3_function": {
+    "purpose": "Worker leve padrao para tarefas gerais de automacao local",
+    "domain": "automacao_termux",
+    "tasks": [
+      "executar scripts Python",
+      "gerenciar arquivos e diretorios",
+      "consultar e modificar configs",
+      "healthcheck do sistema",
+      "tarefas rapidas de CLI"
+    ]
+  },
+
+  "4_limits": {
+    "max_turns": 50,
+    "timeout_s": 300,
+    "max_tokens_per_turn": 2048,
+    "rate_limit_rpm": 20,
+    "cooldown_on_error_s": 10,
+    "thermal_throttle": true,
+    "_note": "governador termico sempre ativo, reduz tokens sob temp >70C"
+  },
+
+  "5_sources": {
+    "rules": [
+      "NeoCortex/RULES.md",
+      "build/RULES.md"
+    ],
+    "docs": [
+      "https://hermes-agent.nousresearch.com/docs"
+    ],
+    "vault": "/storage/emulated/0/Obsidian/Lucas",
+    "apis": [],
+    "_note": "RULES.md carregado como system prompt supplement"
+  },
+
+  "6_tools": {
+    "allow": ["terminal", "file", "web", "skills", "memory", "session_search"],
+    "deny": ["browser", "image_gen", "delegation", "cronjob"],
+    "_note": "whitelist — qualquer toolset fora de 'allow' e bloqueado"
+  },
+
+  "7_memory": {
+    "enabled": true,
+    "targets": ["user", "memory"],
+    "user_profile_enabled": true,
+    "_note": "persiste preferencias do usuario e fatos do ambiente"
+  },
+
+  "8_skills": {
+    "preload": ["bench-llm", "agent-workflow"]
+  },
+
+  "9_delegation": {
+    "enabled": false,
+    "max_children": 0,
+    "_note": "worker leve nao delega — se precisar, escalar para meta"
+  },
+
+  "10_fallback": {
+    "on_error": "retry_then_report",
+    "max_retries": 3,
+    "retry_delay_s": 5,
+    "on_permanent_failure": "log_and_exit",
+    "_note": "3 tentativas, depois loga e encerra"
+  },
+
+  "11_cron": {
+    "jobs": []
+  }
+}

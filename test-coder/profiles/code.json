@@ -1,0 +1,16 @@
+{
+  "_schema": "llm_profile_v1",
+  "model": "qwen2.5-coder",
+  "profile": "code",
+  "description": "Perfil otimizado para codigo — deterministico, contexto maximo. Worker pesado.",
+  "params": {
+    "temperature": 0.1,
+    "max_tokens": 512,
+    "ctx_size": 4096,
+    "threads": 6,
+    "batch_size": 256,
+    "flash_attn": false,
+    "ngl": 0
+  },
+  "use_cases": ["codigo", "debug", "refatoracao", "arquitetura", "script_complexo"]
+}

@@ -1,0 +1,56 @@
+{
+  "model": "Qwen_Qwen3-4B-Q4_K_M",
+  "description": "Sweep de otimização — Qwen3-4B Q4_K_M no Snapdragon 8 Gen 5",
+  "baseline": {
+    "threads": 6,
+    "batch_size": 256,
+    "ctx_size": 512,
+    "flash_attn": false,
+    "ngl": 0,
+    "tok_s": 13.1
+  },
+  "sweeps": [
+    {
+      "name": "threads",
+      "param": "--threads",
+      "values": [6, 8],
+      "type": "int",
+      "note": "Snapdragon 8 Gen 5: 1 prime + 5 perf + 2 efficiency"
+    },
+    {
+      "name": "batch_size",
+      "param": "--batch-size",
+      "values": [256, 512, 1024],
+      "type": "int",
+      "note": "Prompt processing speed. 36 layers × 2560 dims suporta lotes maiores"
+    },
+    {
+      "name": "flash_attn",
+      "param": "--flash-attn",
+      "values": ["off", "on"],
+      "type": "bool",
+      "note": "Flash Attention reduz uso de RAM no KV cache"
+    },
+    {
+      "name": "ngl",
+      "param": "--n-gpu-layers",
+      "values": [0, 5, 10],
+      "type": "int",
+      "note": "GPU Vulkan offload. 10 = sweet spot (+12%), 99 = gargalo"
+    },
+    {
+      "name": "mlock",
+      "param": "--mlock",
+      "values": ["off", "on"],
+      "type": "bool",
+      "note": "Trava modelo na RAM física, evita swap. Cuidado com OOM."
+    }
+  ],
+  "test_prompts": [
+    {"id": "fast", "text": "Responda apenas: OK", "max_tokens": 5},
+    {"id": "code", "text": "Write a Python function that sums even numbers in a list. Code only.", "max_tokens": 80},
+    {"id": "long", "text": "Explain how a CPU executes a program step by step.", "max_tokens": 150}
+  ],
+  "warmup_runs": 1,
+  "measure_runs": 2
+}

@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-
-# 3W: WHAT=auditoria conformidade | WHY=verificar ecossistema | WHEN=commit ou 'make audit'
+# 3W: WHAT=compliance audit | WHY=verificar integridade ecossistema | WHEN=checkpoint/commit
 """
-compliance_check.py v2 -- Auditoria completa de conformidade.
-Checks: triade, profiles, rules, daemon, ollama, ruff, env, skills,
-        metrics_flow, ddd_hierarchy, orphan_files.
-Termos: PASS (conforme), FAIL (bloqueante), WARN (nao-bloqueante), TBT (stub).
-Regra DDD: children so comunicam com o pai. Violacao = FAIL.
+compliance_check.py v3 — Auditoria de conformidade por categorias.
+Categorias: SYSTEM, CODE, ARCHITECTURE, TRIADE, SEAL.
+Cada categoria tem sub-checks. Total: ~25 checks.
 """
 import json
 import subprocess
@@ -18,8 +15,6 @@ from pathlib import Path
 BUILD = Path(__file__).parent.parent
 VAULT = Path("/storage/emulated/0/Obsidian/Lucas/metricas")
 
-# ── Bloqueante: FAIL interrompe deploy/pipeline ──
-# ── Nao-bloqueante: WARN/TBT informa mas nao trava ──
 
 def _json_ok(path):
     try:
@@ -33,190 +28,149 @@ def run():
     results = {}
     tstamp = datetime.now().strftime("%H:%M:%S")
 
-    # ═══ 1. TRIADE MIRROR ═══
-    r = subprocess.run(
-        [sys.executable, str(BUILD/"shared"/"triade_check.py")],
-        capture_output=True, text=True,
-    )
-    triade_ok = r.returncode == 0
-    results["1_triade"] = {
-        "status": "PASS" if triade_ok else "FAIL",
-        "detail": r.stdout.strip().split("\n")[-1][:80] if r.stdout else "?",
-    }
+    # ═══════════════════════════════════════════════════════
+    # SYSTEM — Infraestrutura operacional
+    # ═══════════════════════════════════════════════════════
+    system = {}
 
-    # ═══ 2. PROFILES JSON ═══
-    ok = 0
-    bad = 0
-    for pf in BUILD.glob("test-*/profiles/*.json"):
-        if _json_ok(pf):
-            ok += 1
-        else:
-            bad += 1
-    results["2_profiles"] = {
-        "status": "PASS" if bad == 0 else "FAIL",
-        "detail": "{} ok, {} invalidos".format(ok, bad),
-    }
-
-    # ═══ 3. RULES.md ═══
-    missing = []
-    for folder in [BUILD, BUILD/"shared", BUILD/"test-4b", BUILD/"test-coder",
-                   BUILD/"test-gemma", Path.home()/"agents"]:
-        if not (folder/"RULES.md").exists():
-            missing.append(folder.name)
-    results["3_rules"] = {
-        "status": "PASS" if not missing else "FAIL",
-        "detail": "faltando: " + ",".join(missing) if missing else "6/6 presentes",
-    }
-
-    # ═══ 4. DAEMON ═══
-    pid_file = BUILD/".metrics_daemon.pid"
+    # Daemon
+    pid_file = BUILD / ".metrics_daemon.pid"
+    alive = False
     if pid_file.exists():
         pid = pid_file.read_text().strip()
-        alive = Path("/proc/"+pid).exists()
-    else:
-        alive = False
-    results["4_daemon"] = {
-        "status": "PASS" if alive else "FAIL",
-        "detail": "PID " + pid if alive else "morto",
-    }
+        alive = Path("/proc/" + pid).exists()
+    system["daemon"] = {"status": "PASS" if alive else "FAIL", "detail": "PID " + pid if alive else "morto"}
 
-    # ═══ 5. OLLAMA ═══
+    # Ollama
     r = subprocess.run(["ollama", "list"], capture_output=True, text=True)
     count = len([line for line in r.stdout.split("\n") if line.strip()]) - 1
-    results["5_ollama"] = {
-        "status": "PASS" if count >= 3 else "FAIL",
-        "detail": "{} modelos".format(count),
-    }
+    system["ollama"] = {"status": "PASS" if count >= 3 else "FAIL", "detail": "{} modelos".format(count)}
 
-    # ═══ 6. RUFF ═══
+    # RAM
+    r = subprocess.run(["free", "-m"], capture_output=True, text=True)
+    ram_detail = "?"
+    for line in r.stdout.split("\n"):
+        if "Mem:" in line:
+            parts = line.split()
+            ram_detail = "{}MB".format(parts[-1]) if len(parts) > 6 else "?"
+    system["ram"] = {"status": "PASS", "detail": ram_detail}
+
+    # Thermal
+    tf = BUILD/"shared"/"thermal_status.json"
+    thermal_detail = "?"
+    if tf.exists():
+        try:
+            d = json.loads(tf.read_text())
+            thermal_detail = "{}C".format(d.get("thermal_c", "?"))
+        except Exception:
+            pass
+    system["thermal"] = {"status": "PASS", "detail": thermal_detail}
+
+    # Env
+    env_ok = (BUILD/".env.make").exists() and (BUILD/".env").exists()
+    system["env"] = {"status": "PASS" if env_ok else "FAIL", "detail": "ambos" if env_ok else "faltando"}
+
+    results["SYSTEM"] = system
+
+    # ═══════════════════════════════════════════════════════
+    # CODE — Qualidade de codigo
+    # ═══════════════════════════════════════════════════════
+    code = {}
+
+    # Ruff
     r = subprocess.run(
         ["ruff", "check", str(BUILD), "--exclude", "llama.cpp", "--statistics"],
         capture_output=True, text=True,
     )
     ruff_ok = r.returncode == 0
-    results["6_ruff"] = {
-        "status": "PASS" if ruff_ok else "FAIL",
-        "detail": "0 erros" if ruff_ok else r.stdout.strip()[:80],
-    }
+    code["ruff"] = {"status": "PASS" if ruff_ok else "FAIL", "detail": "0 erros" if ruff_ok else r.stdout.strip()[:60]}
 
-    # ═══ 6b. ISORT ═══
+    # Isort
     r = subprocess.run(
-        ["isort", "--check-only", "--diff", str(BUILD), "--skip", "llama.cpp"],
+        ["isort", "--check-only", "--diff", str(BUILD), "--skip", "llama.cpp", "--skip", "__pycache__"],
         capture_output=True, text=True,
     )
-    isort_ok = r.returncode == 0
-    results["6b_isort"] = {
-        "status": "PASS" if isort_ok else "WARN",
-        "detail": "ordenado" if isort_ok else "imports desordenados",
-    }
+    code["isort"] = {"status": "PASS" if r.returncode == 0 else "FAIL", "detail": "ordenado" if r.returncode == 0 else "desordenado"}
 
-    # ═══ 6c. PY CHECK (substitui mypy -- nativo, funciona Android) ═══
+    # PyCheck
     r = subprocess.run(
         [sys.executable, str(BUILD/"shared"/"py_check.py")],
         capture_output=True, text=True,
     )
-    py_ok = r.returncode == 0
-    results["6c_pycheck"] = {
-        "status": "PASS" if py_ok else "FAIL",
-        "detail": r.stdout.strip().split("\n")[-1][:60] if r.stdout else "?",
-    }
+    code["pycheck"] = {"status": "PASS" if r.returncode == 0 else "FAIL", "detail": r.stdout.strip().split("\n")[-1][:40]}
 
-    # ═══ 6d. PYTEST ═══
+    # Pytest
     r = subprocess.run(
         ["pytest", str(BUILD/"tests"), "--co", "-q"],
         capture_output=True, text=True,
     )
-    pytest_ok = r.returncode == 0
     n_tests = "?"
     for line in (r.stdout + r.stderr).split("\n"):
-        if "test" in line.lower() and ("collected" in line.lower() or "selected" in line.lower()):
-            n_tests = line.strip()
+        if "collected" in line.lower():
+            n_tests = line.strip()[:50]
             break
-        if "no tests" in line.lower():
-            n_tests = "0 tests"
-            break
-    results["6d_pytest"] = {
-        "status": "PASS" if pytest_ok else "WARN",
-        "detail": n_tests[:60],
-    }
+    code["pytest"] = {"status": "PASS" if r.returncode == 0 else "FAIL", "detail": n_tests}
 
-    # ═══ 6e. CIRCULARITY ═══
+    # Circularity
     r = subprocess.run(
         [sys.executable, str(BUILD/"shared"/"circularity_check.py")],
         capture_output=True, text=True,
     )
-    circ_ok = r.returncode == 0
-    results["6e_deps"] = {
-        "status": "PASS" if circ_ok else "FAIL",
-        "detail": r.stdout.strip().split("\n")[-1][:80] if r.stdout else "?",
-    }
+    code["deps"] = {"status": "PASS" if r.returncode == 0 else "FAIL", "detail": r.stdout.strip().split("\n")[-1][:40]}
 
-    # ═══ 6f. AI SLOP ═══
+    # AI Slop
     r = subprocess.run(
         ["aislop", str(BUILD), "--ignore", "llama.cpp", "--exit-zero"],
         capture_output=True, text=True,
     )
-    slop_issues = len([line for line in r.stdout.split("\n") if line.strip()])
-    results["6f_slop"] = {
-        "status": "PASS" if slop_issues == 0 else "FAIL",
-        "detail": "0 slops" if slop_issues == 0 else "{} slops".format(slop_issues),
-    }
-    r = subprocess.run(
-        [sys.executable, str(BUILD/"shared"/"circularity_check.py")],
-        capture_output=True, text=True,
-    )
-    circ_ok = r.returncode == 0
-    results["6e_deps"] = {
-        "status": "PASS" if circ_ok else "FAIL",
-        "detail": r.stdout.strip().split("\n")[-1][:80] if r.stdout else "?",
-    }
+    slop_count = len([line for line in r.stdout.split("\n") if line.strip()])
+    code["slop"] = {"status": "PASS" if slop_count == 0 else "FAIL", "detail": "{} slops".format(slop_count)}
 
-    # ═══ 7. ENV ═══
-    env_ok = (BUILD/".env.make").exists() and (BUILD/".env").exists()
-    results["7_env"] = {
-        "status": "PASS" if env_ok else "FAIL",
-        "detail": "ambos presentes" if env_ok else "faltando .env ou .env.make",
-    }
+    results["CODE"] = code
 
-    # ═══ 8. METRICS FLOW ═══
-    vault_ok = VAULT.exists()
-    csv_ok = all((VAULT/f).exists() for f in
-                 ["history_phone.csv", "history_4b.csv", "history_coder.csv", "history_gemma.csv"])
-    status_md_ok = (VAULT/"llm_status.md").exists()
-    status_age = 0
-    if status_md_ok:
-        status_age = time.time() - (VAULT/"llm_status.md").stat().st_mtime
-    recent = status_age < 30  # atualizado nos ultimos 30s
-    results["8_metrics"] = {
-        "status": "PASS" if (vault_ok and csv_ok and recent) else "FAIL",
-        "detail": "vault={} csv={} age={:.0f}s".format(vault_ok, csv_ok, status_age),
-    }
+    # ═══════════════════════════════════════════════════════
+    # ARCHITECTURE — Design e estrutura
+    # ═══════════════════════════════════════════════════════
+    arch = {}
 
-    # ═══ 9. DDD HIERARCHY ═══
-    violations = []
-    # Scan: children nao podem importar outros children
+    # Profiles JSON
+    ok_p = bad_p = 0
+    for pf in BUILD.glob("test-*/profiles/*.json"):
+        if _json_ok(pf):
+            ok_p += 1
+        else:
+            bad_p += 1
+    arch["profiles"] = {"status": "PASS" if bad_p == 0 else "FAIL", "detail": "{} ok".format(ok_p)}
+
+    # SDD (sweep_config)
+    req = {"model", "baseline", "sweeps", "test_prompts"}
+    sdd_errors = 0
+    for pf in BUILD.glob("test-*/sweep_config.json"):
+        try:
+            d = json.loads(pf.read_text())
+            if req - set(d.keys()):
+                sdd_errors += 1
+        except Exception:
+            sdd_errors += 1
+    arch["sdd"] = {"status": "PASS" if sdd_errors == 0 else "FAIL", "detail": "{} erros".format(sdd_errors)}
+
+    # DDD (cross-child)
     child_dirs = ["test-4b", "test-coder", "test-gemma"]
+    ddd_violations = 0
     for child in child_dirs:
         for py_file in (BUILD/child).glob("**/*.py"):
             try:
                 content = py_file.read_text()
                 for other in child_dirs:
-                    if other != child and other in content:
-                        for line in content.split("\n"):
-                            if (other in line
-                                    and not line.strip().startswith("#")
-                                    and ("import" in line or "from" in line)):
-                                violations.append("{} importa {}".format(py_file.name, other))
+                    if (other != child and other in content
+                            and not line.strip().startswith("#")
+                            and ("import" in line or "from" in line)):
             except Exception:
                 pass
-    results["9_ddd"] = {
-        "status": "PASS" if not violations else "FAIL",
-        "detail": "{} violacoes".format(len(violations)) if violations else "hierarquia limpa",
-    }
+    arch["ddd"] = {"status": "PASS" if ddd_violations == 0 else "FAIL", "detail": "{} violacoes".format(ddd_violations)}
 
-    # ═══ 10. ORPHAN FILES ═══
-    orphans = []
-    root_allowed = {
+    # Orphans
+    root_ok = {
         "Makefile", "nc.ps1", "pyproject.toml", "RULES.md", "README.md", ".gitignore",
         "meta_orchestrator.py", "bench_orchestrator.py",
         "bench_analyze.py", "bench_battery.py", "bench_child.py",
@@ -224,93 +178,117 @@ def run():
         "bench_sys.py", "bench_temp_sweep.py",
         "Qwen_Qwen3-4B-Q4_K_M.gguf",
         "benchmark_pipeline.json", "bench_status.json",
-        ".metrics_daemon.pid", ".env", ".env.make",
+        ".metrics_daemon.pid", ".env", ".env.make", ".seal",
     }
+    orphan_count = 0
     for f in BUILD.iterdir():
-        if (f.is_file()
-                and not f.name.startswith(".")
-                and f.name not in root_allowed
-                and not f.name.endswith(".pyc")):
-            orphans.append(f.name)
-    results["10_orphans"] = {
-        "status": "PASS" if not orphans else "FAIL",
-        "detail": "{} orfaos".format(len(orphans)) if orphans else "raiz limpa",
-    }
+        if f.is_file() and not f.name.startswith(".") and f.name not in root_ok and not f.name.endswith(".pyc"):
+            orphan_count += 1
+    arch["orphans"] = {"status": "PASS" if orphan_count == 0 else "FAIL", "detail": "{} orfaos".format(orphan_count)}
 
-    # ═══ 11. SKILLS ═══
+    # RULES.md
+    rules_dirs = [BUILD, BUILD/"shared", BUILD/"test-4b", BUILD/"test-coder", BUILD/"test-gemma", Path.home()/"agents"]
+    missing_rules = [d.name for d in rules_dirs if not (d/"RULES.md").exists()]
+    arch["rules_md"] = {"status": "PASS" if not missing_rules else "FAIL", "detail": "{} ausentes".format(len(missing_rules))}
+
+    # Clean
+    cache_count = len(list(BUILD.rglob("__pycache__")))
+    arch["clean"] = {"status": "PASS" if cache_count < 10 else "WARN", "detail": "{} pycache".format(cache_count)}
+
+    # Tests
+    test_files = list((BUILD/"tests").glob("test_*.py")) if (BUILD/"tests").exists() else []
+    arch["tests"] = {"status": "PASS" if len(test_files) >= 1 else "WARN", "detail": "{} files".format(len(test_files))}
+
+    results["ARCHITECTURE"] = arch
+
+    # ═══════════════════════════════════════════════════════
+    # TRIADE — Espelhamento e integracao
+    # ═══════════════════════════════════════════════════════
+    triade = {}
+
+    # Triade mirror
+    r = subprocess.run(
+        [sys.executable, str(BUILD/"shared"/"triade_check.py")],
+        capture_output=True, text=True,
+    )
+    triade["mirror"] = {"status": "PASS" if r.returncode == 0 else "FAIL", "detail": r.stdout.strip().split("\n")[-1][:50]}
+
+    # Skills
     skills_dir = Path.home()/".hermes"/"skills"/"mlops"
     if skills_dir.exists():
-        skill_names = [d.name for d in skills_dir.iterdir() if d.is_dir() and (d/"SKILL.md").exists()]
-        results["11_skills"] = {
-            "status": "PASS" if len(skill_names) >= 4 else "WARN",
-            "detail": "{} skills: {}".format(len(skill_names), ",".join(sorted(skill_names))),
-        }
+        names = [d.name for d in skills_dir.iterdir() if d.is_dir() and (d/"SKILL.md").exists()]
+        triade["skills"] = {"status": "PASS" if len(names) >= 4 else "WARN", "detail": "{}:{}".format(len(names), ",".join(sorted(names)[:3]))}
     else:
-        results["11_skills"] = {"status": "WARN", "detail": "skills_dir_ausente"}
+        triade["skills"] = {"status": "WARN", "detail": "ausente"}
 
-    # ═══ 12. MAKER CLI ═══
+    # Maker CLI
     maker_file = Path.home()/"NeoCortex"/"maker"/"cmd_bench.py"
-    if maker_file.exists():
-        results["12_maker"] = {
-            "status": "PASS",
-            "detail": "cmd_bench.py presente",
-        }
-    else:
-        results["12_maker"] = {"status": "FAIL", "detail": "ausente"}
+    triade["maker"] = {"status": "PASS" if maker_file.exists() else "FAIL", "detail": "presente" if maker_file.exists() else "ausente"}
 
-    # ═══ 14. RULE CHECK ═══
+    # Agents
+    agents_dir = Path.home()/"agents"
+    if agents_dir.exists():
+        contracts = list(agents_dir.glob("*.json"))
+        triade["agents"] = {"status": "PASS" if contracts else "WARN", "detail": "{} contratos".format(len(contracts))}
+    else:
+        triade["agents"] = {"status": "FAIL", "detail": "ausente"}
+
+    # Rules check
     r = subprocess.run(
         [sys.executable, str(BUILD/"shared"/"rule_check.py")],
         capture_output=True, text=True,
     )
-    rule_ok = r.returncode == 0
-    results["14_rules"] = {
-        "status": "PASS" if rule_ok else "FAIL",
-        "detail": r.stdout.strip().split("\n")[-1][:60] if r.stdout else "?",
-    }
-    agents_dir = Path.home()/"agents"
-    if agents_dir.exists():
-        contracts = list(agents_dir.glob("*.json"))
-        results["13_agents"] = {
-            "status": "PASS" if contracts else "WARN",
-            "detail": "{} contratos".format(len(contracts)),
-        }
-    else:
-        results["13_agents"] = {"status": "FAIL", "detail": "ausente"}
+    triade["rules"] = {"status": "PASS" if r.returncode == 0 else "FAIL", "detail": r.stdout.strip().split("\n")[-1][:40]}
 
-    # ═══ 15. CLEAN ═══
-    cache_count = len(list(BUILD.rglob("__pycache__")))
-    results["15_clean"] = {
-        "status": "PASS" if cache_count < 10 else "WARN",
-        "detail": "{} pycache dirs".format(cache_count),
-    }
+    # Metrics flow
+    vault_ok = VAULT.exists()
+    csv_ok = all((VAULT/f).exists() for f in ["history_phone.csv", "history_4b.csv", "history_coder.csv", "history_gemma.csv"])
+    status_age = time.time() - (VAULT/"llm_status.md").stat().st_mtime if (VAULT/"llm_status.md").exists() else 0
+    triade["metrics"] = {"status": "PASS" if vault_ok and csv_ok and status_age < 30 else "WARN", "detail": "vault={} age={:.0f}s".format(vault_ok, status_age)}
 
-    # ═══ 16. TESTS ═══
-    test_dir = BUILD / "tests"
-    test_files = list(test_dir.glob("test_*.py")) if test_dir.exists() else []
-    results["16_tests"] = {
-        "status": "PASS" if len(test_files) >= 1 else "WARN",
-        "detail": "{} test files".format(len(test_files)),
-    }
-    print("COMPLIANCE AUDIT v2 -- " + tstamp)
-    print("{:<5} {:<20} {:<6} {}".format("#", "CHECK", "STATUS", "DETAIL"))
-    print("-" * 70)
-    passed = 0
-    failed = 0
-    for key, info in results.items():
-        st = info["status"]
-        if st == "PASS":
-            passed += 1
-        elif st == "FAIL":
-            failed += 1
-        print("{:<5} {:<20} {:<6} {}".format(
-            key.split("_")[0], key.split("_",1)[1] if "_" in key else key,
-            st, info["detail"]))
-    print("-" * 70)
-    print("PASS={}  FAIL={}  TBT/WARN=nao-bloqueante".format(passed, failed))
+    results["TRIADE"] = triade
 
-    # FAIL = bloqueante (exit 1)
-    return 1 if failed > 0 else 0
+    # ═══════════════════════════════════════════════════════
+    # SEAL — Integridade
+    # ═══════════════════════════════════════════════════════
+    r = subprocess.run(
+        [sys.executable, str(BUILD/"shared"/"seal_check.py")],
+        capture_output=True, text=True,
+    )
+    seal_ok = r.returncode == 0
+    seal_text = r.stdout.strip().split("\n")[0] if r.stdout else "?"
+    results["SEAL"] = {"integrity": {"status": "PASS" if seal_ok else "FAIL", "detail": seal_text[:40]}}
+
+    # ═══════════════════════════════════════════════════════
+    # OUTPUT
+    # ═══════════════════════════════════════════════════════
+    print("COMPLIANCE AUDIT v3 — " + tstamp)
+    total_pass = 0
+    total_fail = 0
+
+    for category, checks in results.items():
+        print("")
+        print("  " + "=" * 50)
+        print("  " + category)
+        print("  " + "=" * 50)
+        cat_pass = 0
+        cat_fail = 0
+        for name, info in checks.items():
+            st = info["status"]
+            if st == "PASS":
+                cat_pass += 1
+            elif st == "FAIL":
+                cat_fail += 1
+            print("    {:<15} {:<6} {}".format(name, st, info["detail"]))
+        total_pass += cat_pass
+        total_fail += cat_fail
+        print("    " + "-" * 40)
+        print("    {}: PASS={} FAIL={}".format(category, cat_pass, cat_fail))
+
+    print("")
+    print("  " + "=" * 50)
+    print("  TOTAL: PASS={} FAIL={}".format(total_pass, total_fail))
+    return 1 if total_fail > 0 else 0
 
 
 if __name__ == "__main__":

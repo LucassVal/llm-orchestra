@@ -31,12 +31,12 @@ export OLLAMA_CONTEXT_LENGTH
 # CHECKPOINT — obrigatorio antes de qualquer acao
 # ═══════════════════════════════════════════════════════════════
 
-checkpoint: lint deps rules audit
+checkpoint: lint deps rules audit seal
 	@echo ""
-	@echo "✓ CHECKPOINT: lint + deps + rules + audit — todos PASS"
+	@echo "✓ CHECKPOINT: lint + deps + rules + audit + seal — todos PASS"
 	@echo ""
 
-lint: ## [1/5] Ruff + isort + py_check (0 erros obrigatorio)
+lint: ## [1/6] Ruff + isort + py_check (0 erros obrigatorio)
 	@cd $(BUILD) && ruff check . --exclude llama.cpp && \
 	 isort --check-only --diff . --skip llama.cpp --skip __pycache__ && \
 	 python3 shared/py_check.py
@@ -50,8 +50,14 @@ rules: ## [3/5] Rule check (13 R-BENCH-*, todas ERR exceto RAM+Thermal)
 audit: ## [4/5] Compliance audit (21 checks: triade, DDD, orphans, MCP...)
 	@cd $(BUILD) && python3 shared/compliance_check.py
 
-gate: ## [5/5] Pre-commit gate (stub + slop + mock + rules + audit)
+gate: ## [6/6] Pre-commit gate (stub + slop + mock + rules + audit)
 	@cd $(BUILD) && python3 shared/pre_commit_hook.py
+
+seal: ## [5/6] Selo de integridade (hash SHA256 de arquivos criticos)
+	@cd $(BUILD) && python3 shared/seal_check.py
+
+seal-reset: ## Reseta o selo (apos mudanca intencional)
+	@cd $(BUILD) && python3 shared/seal_check.py --reset
 
 
 # ═══════════════════════════════════════════════════════════════

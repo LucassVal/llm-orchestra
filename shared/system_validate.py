@@ -11,7 +11,6 @@ Verifica:
   6. Commit log obrigatorio no seal
 """
 import ast
-import json
 import re
 import subprocess
 import sys

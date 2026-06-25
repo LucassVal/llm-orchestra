@@ -122,6 +122,12 @@ def main():
     rules_ok, rules_out = run_rules()
     audit_ok, audit_out = run_audit()
 
+    # ── COMPLIANCE (visao geral do sistema) ──
+    print("=" * 70)
+    print("  COMPLIANCE AUDIT — Visao Geral do Sistema")
+    print("=" * 70)
+    print(audit_out)
+
     # ── Rules ──
     if not rules_ok:
         print("=" * 70)
@@ -130,6 +136,8 @@ def main():
         print(rules_out)
         print("=" * 70)
         print()
+    else:
+        print(rules_out)
 
     # ── AI Slop ──
     if not slop_ok:
@@ -167,9 +175,7 @@ def main():
         print("=" * 70)
         print()
 
-    # ── Compliance ──
-    print(audit_out)
-
+    # ── Compliance (ja exibido acima como visao geral) ──
     # ── GATE (ALL ERR) ──
     has_issues = bool(findings) or not slop_ok or not mock_ok or not rules_ok or not audit_ok
 

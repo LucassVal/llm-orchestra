@@ -120,6 +120,17 @@ def create_agent(contract_path, output_dir=None):
     for doc in c["5_sources"].get("docs", []):
         md.append("- {}".format(doc))
 
+    # Skills injection
+    skills = c.get("8_skills", {})
+    if skills.get("preload"):
+        md.append("")
+        md.append("## Skills (carregadas do Hermes)")
+        for skill in skills["preload"]:
+            md.append("- {}".format(skill))
+        md.append("")
+        md.append("Ao iniciar, carregar estas skills via `skill_view('{}')`.".format(
+            skills["preload"][0]))
+
     (out / "AGENT.md").write_text("\n".join(md))
 
     # Copia contrato

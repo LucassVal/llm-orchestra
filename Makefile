@@ -30,6 +30,19 @@ boot: ## Health check completo + compliance audit
 audit: ## Compliance audit (triade mirror, profiles, rules, daemon, ollama, ruff, env, skills)
 	@cd $(BUILD) && python3 shared/compliance_check.py
 
+clean: ## Limpa logs, cache, temp
+	@cd $(BUILD) && rm -rf logs/*.log __pycache__ */__pycache__ .pytest_cache && echo "limpo"
+
+test: ## Roda todos os testes (pytest + smoke)
+	@cd $(BUILD) && pytest tests/ -v
+
+install: ## Setup automatizado do ecossistema
+	@echo "=== INSTALL: LLM-Orchestra ==="
+	@pip install -q ruff isort pytest mock aislop 2>/dev/null
+	@cd $(BUILD) && make hook-install
+	@cd $(BUILD) && make daemon-start 2>/dev/null || true
+	@echo "✓ Instalado. Rode 'make boot' para verificar."
+
 gate: ## Pre-commit gate (stub + slop + mock + rules + audit)
 	@cd $(BUILD) && python3 shared/pre_commit_hook.py
 

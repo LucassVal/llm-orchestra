@@ -15,6 +15,9 @@ param(
 $BUILD = "$HOME\build"
 
 function boot { Push-Location $BUILD; python shared/compliance_check.py; Pop-Location }
+function clean { Push-Location $BUILD; rm -r -Force logs/*.log,__pycache__,*/\__pycache__,.pytest_cache 2>$null; Write-Host "limpo" }
+function test { Push-Location $BUILD; pytest tests/ -v; Pop-Location }
+function install { pip install -q ruff isort pytest mock aislop; Push-Location $BUILD; make hook-install; Pop-Location; Write-Host "instalado" }
 function lint { Push-Location $BUILD; ruff check . --exclude llama.cpp; isort --check-only --diff . --skip llama.cpp --skip __pycache__; Pop-Location }
 function gate { Push-Location $BUILD; python shared/pre_commit_hook.py; Pop-Location }
 function rules { Push-Location $BUILD; python shared/rule_check.py; Pop-Location }
@@ -41,6 +44,9 @@ function daemon-status { Push-Location $BUILD; python meta_orchestrator.py --dae
 
 switch ($Command) {
     "boot" { boot }
+    "clean" { clean }
+    "test" { test }
+    "install" { install }
     "audit" { audit }
     "lint" { lint }
     "deps" { deps }

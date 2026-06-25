@@ -276,7 +276,20 @@ def run():
     else:
         results["13_agents"] = {"status": "FAIL", "detail": "ausente"}
 
-    # ═══ TABELA ═══
+    # ═══ 15. CLEAN ═══
+    cache_count = len(list(BUILD.rglob("__pycache__")))
+    results["15_clean"] = {
+        "status": "PASS" if cache_count < 10 else "WARN",
+        "detail": "{} pycache dirs".format(cache_count),
+    }
+
+    # ═══ 16. TESTS ═══
+    test_dir = BUILD / "tests"
+    test_files = list(test_dir.glob("test_*.py")) if test_dir.exists() else []
+    results["16_tests"] = {
+        "status": "PASS" if len(test_files) >= 1 else "WARN",
+        "detail": "{} test files".format(len(test_files)),
+    }
     print("COMPLIANCE AUDIT v2 — " + tstamp)
     print("{:<5} {:<20} {:<6} {}".format("#", "CHECK", "STATUS", "DETAIL"))
     print("-" * 70)

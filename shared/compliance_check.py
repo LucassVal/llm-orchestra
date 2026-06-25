@@ -249,8 +249,44 @@ def run():
     results["TRIADE"] = triade
 
     # ═══════════════════════════════════════════════════════
-    # SEAL — Integridade
+    # VALIDATION — Funcoes, testes, cobertura
     # ═══════════════════════════════════════════════════════
+    r = subprocess.run(
+        [sys.executable, str(BUILD/"shared"/"system_validate.py")],
+        capture_output=True, text=True,
+    )
+    val_lines = r.stdout.split("\n")
+
+    # Extrai metricas do output
+    funcs_total = funcs_real = funcs_stubs = 0
+    orphans_list = []
+    triad_ok = False
+    seal_ok = False
+    for line in val_lines:
+        if "Total:" in line:
+            funcs_total = int(line.split(":")[-1].strip())
+        elif "Reais:" in line:
+            funcs_real = int(line.split(":")[-1].strip())
+        elif "Stubs:" in line:
+            funcs_stubs = int(line.split(":")[-1].strip())
+        elif line.strip().startswith("✓ triade"):
+            triad_ok = True
+        elif line.strip().startswith("✓ commit:"):
+            seal_ok = True
+
+    validation = {
+        "funcs": {"status": "PASS" if funcs_stubs == 0 else "FAIL", "detail": "{} reais, {} stubs".format(funcs_real, funcs_stubs)},
+        "triade": {"status": "PASS" if triad_ok else "FAIL", "detail": "espelhada" if triad_ok else "gaps"},
+        "seal_log": {"status": "PASS" if seal_ok else "FAIL", "detail": "vinculado" if seal_ok else "orfao"},
+    }
+
+    # Test coverage: verifica se cada .py tem correspondente test_
+    py_files = [f for f in BUILD.rglob("*.py") if "llama.cpp" not in str(f) and "__pycache__" not in str(f) and ".git" not in str(f)]
+    test_files = {f.stem.replace("test_", "") for f in (BUILD/"tests").glob("test_*.py")} if (BUILD/"tests").exists() else set()
+    uncovered = [f.name for f in py_files if f.stem not in test_files and f.stat().st_size > 500]
+    validation["coverage"] = {"status": "PASS" if len(uncovered) < 20 else "WARN", "detail": "{} sem teste".format(len(uncovered))}
+
+    results["VALIDATION"] = validation
     r = subprocess.run(
         [sys.executable, str(BUILD/"shared"/"seal_check.py")],
         capture_output=True, text=True,

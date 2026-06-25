@@ -31,9 +31,9 @@ export OLLAMA_CONTEXT_LENGTH
 # CHECKPOINT — obrigatorio antes de qualquer acao
 # ═══════════════════════════════════════════════════════════════
 
-checkpoint: lint deps rules audit seal
+checkpoint: lint deps rules audit seal validate
 	@echo ""
-	@echo "✓ CHECKPOINT: lint + deps + rules + audit + seal — todos PASS"
+	@echo "✓ CHECKPOINT: lint + deps + rules + audit + seal + validate — todos PASS"
 	@echo ""
 
 lint: ## [1/6] Ruff + isort + py_check (0 erros obrigatorio)
@@ -58,6 +58,9 @@ seal: ## [5/6] Selo de integridade (hash SHA256 de arquivos criticos)
 
 seal-reset: ## Reseta o selo (apos mudanca intencional)
 	@cd $(BUILD) && python3 shared/seal_check.py --reset
+
+validate: ## [6/7] Validacao completa (funcoes, stubs, orfaos, contratos)
+	@cd $(BUILD) && python3 shared/system_validate.py
 
 
 # ═══════════════════════════════════════════════════════════════

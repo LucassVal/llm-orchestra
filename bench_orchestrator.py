@@ -747,6 +747,15 @@ def main():
     atexit.register(_cleanup_lock)
 
     run_id = trace()
+    # Source .env obrigatorio (R-OLLAMA-SOURCE)
+    env_file = os.path.join(BUILD, ".env")
+    if os.path.exists(env_file):
+        with open(env_file) as ef:
+            for line in ef:
+                line = line.strip()
+                if line.startswith("export ") and "=" in line:
+                    key, val = line.replace("export ", "").split("=", 1)
+                    os.environ[key] = val.strip('"').strip("'")
     with open(LOG_FILE, "a") as f:
         f.write(f"BENCHMARK RUN {run_id}  |  {datetime.now()}\n")
 

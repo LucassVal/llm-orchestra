@@ -195,7 +195,7 @@ def check_ascii():
 
 
 def check_env():
-    """.env.make com 6 vars (ERR)"""
+    """.env.make com 6 vars + Ollama envs ativas no processo (ERR)"""
     envf = BUILD / ".env.make"
     if not envf.exists():
         return False, ".env.make ausente"
@@ -206,7 +206,11 @@ def check_env():
     missing = [v for v in required if v not in text]
     if missing:
         return False, "faltam:" + ",".join(missing)
-    return True, "6/6 vars"
+    # Verifica se estao ativas no processo atual
+    active = [v for v in required if os.environ.get(v)]
+    if len(active) < 6:
+        return False, "{} ativas, 6 requeridas".format(len(active))
+    return True, "6/6 vars ativas"
 
 
 def check_orchestrator():

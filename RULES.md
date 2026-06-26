@@ -200,7 +200,15 @@ o OOM killer matou o processo. Verificar `dmesg` para `Out of memory`.
 
 **Regra absoluta: NUNCA bloquear. Sempre degradar.**
 
-## R-BENCH-ENV — Variaveis Obrigatorias
+## R-BENCH-OLLAMA — Configuracao Obrigatoria
+
+**Sub-regras:**
+1. **R-OLLAMA-ENV**: `.env` obrigatorio com 6 vars (KEEP_ALIVE, MAX_LOADED, KV_CACHE, FLASH_ATTN, MAX_QUEUE, CONTEXT_LENGTH)
+2. **R-OLLAMA-SOURCE**: `bench_orchestrator.py` DEVE sourcear `.env` antes de iniciar servidor
+3. **R-OLLAMA-CHECK**: `make rules` → R-USE:Ollama verifica `ollama list` e envs
+4. **R-OLLAMA-BINARY**: sempre usar Ollama binary em `/data/data/com.termux/files/usr/lib/ollama/llama-server`
+
+**NUNCA rodar pipeline sem `.env` sourceado. NUNCA usar binario compilado.**
 
 Devem estar em `~/.bashrc`:
 ```bash

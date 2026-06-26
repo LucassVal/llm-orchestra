@@ -14,6 +14,10 @@ Camadas: Domain → Application → Infrastructure → Presentation
 Regras: R-TRACE, R-NO-SILENT-FAIL, R-IDEMPOTENT, R-KISS, R-PYTHON-FIRST.
 """
 import json
+from shared.dispatch_log import create as dispatch_create
+from shared.dispatch_log import complete as dispatch_complete
+from shared.dispatch_log import fail as dispatch_fail
+
 import os
 import signal as _signal
 import subprocess
@@ -943,6 +947,12 @@ def main():
             
             for test_name, script, test_args, timeout in TESTS:
                 step_n = i * len(TESTS) + list(dict(TESTS).keys()).index(test_name) + 1
+                # Dispatch log: registro PRE
+                dh = dispatch_create(
+                    agent_id=m.name.replace("_", "-"),
+                    function=test_name,
+                    model=m.name,
+                )
                 # Power-throttle: governador termico reduz tokens se necessario
                 limit = get_thermal_limit()
                 tier = "full"
@@ -969,6 +979,9 @@ def main():
                 result = run_pipeline_child(script, test_args, test_name,
                                             registry, timeout, env=test_env)
                 model_result["tests"][test_name] = result
+                # Dispatch log: registro POST
+                tok_s = result.get("summary", {}).get("avg_tok_s", 0) if isinstance(result, dict) else 0
+                dispatch_complete(dh, result.get("status", "?"), tok_s=tok_s)
                 
                 if result.get("status") == "OOM_PROTECT":
                     tee(f"  ⛔ Pipeline interrompido por OOM em {m.name}")

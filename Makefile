@@ -172,6 +172,9 @@ agent-profiles: ## Lista perfis disponiveis por LLM
 multi: checkpoint ## Orquestrador multi-agente (ARGS="list")
 	@cd $(BUILD) && python3 shared/multi_agent.py $(ARGS)
 
+dispatch-list: ## Lista ultimos disparos (JSON dispatch log)
+	@cd $(BUILD) && python3 shared/dispatch_log.py list
+
 
 # ═══════════════════════════════════════════════════════════════
 # DAEMON (nao requer checkpoint — controle operacional)

@@ -31,3 +31,4 @@ Thumbs.db
 *~
 benchmark_pipeline.json
 llama.cpp/
+.smellcheck-cache/

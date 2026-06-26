@@ -35,3 +35,4 @@ llama.cpp/
 benchmark_pipeline.json
 *.gguf
 *.gguf
+.orchestrator.lock

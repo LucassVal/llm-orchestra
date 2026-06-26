@@ -895,8 +895,8 @@ def main():
                         break
             
             # Inicia servidor UMA vez para todos os testes
-            is_gemma = "gemma" in m.name.lower()
-            if is_gemma:
+            # Ollama binary para TODOS modelos (10x mais rapido)
+            if os.path.exists(OLLAMA_SERVER_BIN):
                 srv = ServerManager(OLLAMA_SERVER_BIN, OLLAMA_LD_PATH, port=8080)
             else:
                 srv = ServerManager(DEFAULT_SERVER_BIN, DEFAULT_LD_PATH, port=8080)
@@ -932,8 +932,8 @@ def main():
                 ("sweep",     os.path.join(BUILD, "bench_sweep.py"),
                  [sys.executable, "-u", os.path.join(BUILD, "bench_sweep.py"),
                   "--gguf", gguf, "--model-name", m.name,
-                  "--config", str(BUILD / f"test-{m.name.split('-')[0][:4]}/sweep_config.json"),
-                  "--output", str(BUILD / f"test-{m.name.split('-')[0][:4]}/sweep_results.json")], 1800),
+                  "--config", str(BUILD / "test-4b" / "sweep_config.json"),
+                  "--output", str(BUILD / "test-4b" / "sweep_results.json")], 1800),
                 ("ppl",       os.path.join(BUILD, "bench_ppl.py"),
                  [sys.executable, "-u", os.path.join(BUILD, "bench_ppl.py"),
                   "--model-name", m.name, "--gguf", gguf,

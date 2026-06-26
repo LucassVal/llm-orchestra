@@ -40,11 +40,10 @@ def find_python_functions():
                 is_stub = False
                 if len(body) == 1:
                     stmt = body[0]
-                    if isinstance(stmt, ast.Pass):
+                    if isinstance(stmt, ast.Pass) or (isinstance(stmt, ast.Expr)
+                          and isinstance(stmt.value, ast.Constant)
+                          and (stmt.value.value is Ellipsis or stmt.value.value == "...")):
                         is_stub = True
-                    elif isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Constant):
-                        if stmt.value.value is Ellipsis or stmt.value.value == "...":
-                            is_stub = True
                 elif len(body) == 0:
                     is_stub = True
                 funcs["{}:{}".format(rel, name)] = {
@@ -69,9 +68,8 @@ def find_function_calls():
             continue
         rel = str(py_file.relative_to(BUILD))
         for node in ast.walk(tree):
-            if isinstance(node, ast.Call):
-                if isinstance(node.func, ast.Name):
-                    calls[node.func.id].add(rel)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+                calls[node.func.id].add(rel)
     return calls
 
 

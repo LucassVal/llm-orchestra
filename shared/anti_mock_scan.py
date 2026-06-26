@@ -61,8 +61,8 @@ def scan_file(filepath):
                                                     "detail": f"Le {cf} como fonte (cache, nao real)",
                                                     "source": source[:60],
                                                 })
-                                    except Exception as e:
-                                        except_pass("anti_mock", "ast_parse", str(e)[:60])
+                                    except Exception:
+                                        pass
 
         # Padrão 2: except Exception com pass PURO (sem return/fallback)
         if isinstance(node, ast.ExceptHandler):
@@ -74,7 +74,6 @@ def scan_file(filepath):
                 if is_pure_pass:
                     # Verifica se está em função de cleanup (atexit, finally, cleanup, stop)
                     is_cleanup = False
-                    parent = getattr(node, 'parent', None)
                     # Heurística: se a função contém 'cleanup' ou 'stop' ou 'kill', é intencional
                     for ancestor in ast.walk(tree):
                         if isinstance(ancestor, ast.FunctionDef):

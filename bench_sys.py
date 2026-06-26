@@ -57,8 +57,8 @@ class SysMonitor:
                     if ":" in line:
                         k, v = line.split(":", 1)
                         mem[k.strip()] = int(v.strip().split()[0]) // 1024  # KB→MB
-        except Exception as e:
-            except_pass("bench_sys", "thermal_zone_read", str(e)[:60])
+        except Exception:
+            pass
         total = mem.get("MemTotal", 0)
         avail = mem.get("MemAvailable", 0)
         used = total - avail if total and avail else 0

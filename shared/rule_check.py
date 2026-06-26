@@ -12,8 +12,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-from shared.debug_log import except_pass
-
 BUILD = Path(__file__).parent.parent
 
 
@@ -34,8 +32,8 @@ def check_use():
             d = json.loads((BUILD/"bench_status.json").read_text())
             if d.get("phase") not in (None, "done"):
                 issues.append("pipeline ativo: {}".format(d.get("phase")))
-        except Exception as e:
-            except_pass("rule_check", "bench_status_read", str(e)[:60])
+        except Exception:
+            pass
     # 2. RAM
     r = _run(["free", "-m"])
     for line in r.stdout.split("\n"):
@@ -58,8 +56,8 @@ def check_use():
             d = json.loads(tf.read_text())
             if d.get("thermal_c", 105) > 95:
                 pass  # nao bloqueia -- governador gerencia
-        except Exception as e:
-            except_pass("rule_check", "bench_status_read", str(e)[:60])
+        except Exception:
+            pass
     if issues:
         return False, "{} checks falharam: {}".format(len(issues), "; ".join(issues[:3]))
     return True, "5/5 checks OK"
@@ -115,16 +113,16 @@ def check_search():
                 if "search" in name.lower() or "ddg" in name.lower():
                     has_search = True
                     break
-        except Exception as e:
-            except_pass("rule_check", "bench_status_read", str(e)[:60])
+        except Exception:
+            pass
     # Fallback: verifica se o modulo Python existe
     if not has_search:
         try:
             import urllib.request
             urllib.request.urlopen("https://duckduckgo.com", timeout=3)
             has_search = True
-        except Exception as e:
-            except_pass("rule_check", "bench_status_read", str(e)[:60])
+        except Exception:
+            pass
     if not has_search:
         return False, "nenhum MCP de busca configurado"
     return True, "search disponivel"
@@ -164,8 +162,8 @@ def check_3w():
             text = py_file.read_text()
             if len(text.split("\n")) > 100 and "3W" not in text[:500] and "WHAT" not in text[:500]:
                 missing.append(py_file.name)
-        except Exception as e:
-            except_pass("rule_check", "bench_status_read", str(e)[:60])
+        except Exception:
+            pass
     if missing:
         return False, "{} sem 3W".format(len(missing))
     return True, "todos com 3W"
@@ -190,8 +188,8 @@ def check_ascii():
                         clean += ch
                 if "\u2014" in clean or "\u2013" in clean:
                     violations.append("{}:{}".format(py_file.name, lineno))
-        except Exception as e:
-            except_pass("rule_check", "bench_status_read", str(e)[:60])
+        except Exception:
+            pass
     if violations:
         return False, "{} em-dash".format(len(violations))
     return True, "ASCII limpo"
@@ -289,8 +287,8 @@ def check_audit():
                 if 'open(' in line and '"w"' in line:
                     if any(kw in line.lower() for kw in ['log', 'benchmark', 'result']):
                         violations.append("{}: {}".format(py_file.name, line.strip()[:60]))
-        except Exception as e:
-            except_pass("rule_check", "bench_status_read", str(e)[:60])
+        except Exception:
+            pass
     if violations:
         return False, "{} log-truncations".format(len(violations))
     return True, "logs append-only"

@@ -95,9 +95,6 @@ def list_recent(limit=10):
         ))
 
 
-from shared.debug_log import except_pass
-
-
 def _read_thermal():
     """Le sensores REAIS (nao cache antigo)."""
     try:
@@ -111,8 +108,8 @@ def _read_thermal():
                         continue
                 with open(zone) as f:
                     temps.append(int(f.read().strip()) / 1000.0)
-            except Exception as e:
-                except_pass("dispatch_log", "thermal_sensor_read", str(e)[:60])
+            except Exception:
+                pass
         return max(temps) if temps else 0
     except Exception:
         return 0

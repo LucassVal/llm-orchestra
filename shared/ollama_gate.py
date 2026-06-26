@@ -5,7 +5,6 @@ ollama_gate.py -- Checklist pre-pipeline Ollama.
 Verifica: 6 envs ativas, binary correto, modelos >= 3, keep_alive configurado.
 ERR bloqueante -- sem Ollama configurado, pipeline nao roda.
 """
-import json
 import os
 import subprocess
 import sys
@@ -49,7 +48,7 @@ def check_models():
     r = subprocess.run(["ollama", "list"], capture_output=True, text=True)
     if r.returncode != 0:
         return False, "Ollama offline"
-    count = len([l for l in r.stdout.split("\n") if l.strip()]) - 1
+    count = len([line for line in r.stdout.split("\n") if line.strip()]) - 1
     if count < 3:
         return False, "{} modelos (min 3)".format(count)
     return True, "{} modelos".format(count)

@@ -76,9 +76,10 @@ def main():
     # Verifica servidor
     try:
         urllib.request.urlopen(f"{args.server_url}/health", timeout=5)
-    except Exception:
-        print(json.dumps({"model": args.model_name, "status": "SERVER_OFFLINE"}))
-        return
+    except Exception as e:
+        print(json.dumps({"model": args.model_name, "status": "SERVER_OFFLINE",
+                          "error": str(e)[:80]}))
+        sys.exit(1)
 
     total_tests = len(TEMPS) * (len(CREATIVE_PROMPTS) + 1) * RUNS_PER_TEMP
     test_idx = 0

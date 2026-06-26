@@ -9,6 +9,7 @@ Usa llama-server recompilado. Output JSON via stdout.
 import argparse
 import json
 import os
+import sys
 import urllib.request
 
 from bench_sys import SysMonitor
@@ -84,9 +85,10 @@ def main():
     # Verifica servidor
     try:
         urllib.request.urlopen(f"{args.server_url}/health", timeout=5)
-    except Exception:
-        print(json.dumps({"model": args.model_name, "status": "SERVER_OFFLINE"}))
-        return
+    except Exception as e:
+        print(json.dumps({"model": args.model_name, "status": "SERVER_OFFLINE",
+                          "error": str(e)[:80]}))
+        sys.exit(1)
 
     monitor = SysMonitor()
     results = []

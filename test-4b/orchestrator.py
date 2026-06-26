@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # 3W: WHAT=orquestrador 4B | WHY=executar pipeline completo | WHEN=pipeline-4b
 """
-orquestrador-4b — Orquestrador dedicado ao Qwen3-4B (2.4GB).
+orquestrador-4b -- Orquestrador dedicado ao Qwen3-4B (2.4GB).
 Worker leve. Pipeline: stress→battery→creative→temp_sweep→sweep→ppl→analyze.
 Resultados em ~/build/logs/ (append-only, timestamp, NUNCA sobrescreve).
 """

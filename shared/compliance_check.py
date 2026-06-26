@@ -299,7 +299,7 @@ def run():
     results["SEAL"] = {"integrity": {"status": "PASS" if seal_ok else "FAIL", "detail": seal_text[:40]}}
 
     # ═══════════════════════════════════════════════════════
-    # OUTPUT (formato padronizado — NUNCA alterar)
+    # OUTPUT (formato padronizado -- NUNCA alterar)
     # ═══════════════════════════════════════════════════════
     print("")
     print("  COMPLIANCE AUDIT | v3 | " + tstamp)

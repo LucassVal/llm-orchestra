@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # 3W: WHAT=ollama gate | WHY=verificar envs+binary antes pipeline | WHEN=pre-pipeline
 """
-ollama_gate.py — Checklist pre-pipeline Ollama.
+ollama_gate.py -- Checklist pre-pipeline Ollama.
 Verifica: 6 envs ativas, binary correto, modelos >= 3, keep_alive configurado.
-ERR bloqueante — sem Ollama configurado, pipeline nao roda.
+ERR bloqueante -- sem Ollama configurado, pipeline nao roda.
 """
 import json
 import os

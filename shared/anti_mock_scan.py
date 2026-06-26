@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # 3W: WHAT=anti-mock scan | WHY=detectar funcoes conceituais/falsas | WHEN=auditoria
 """
-anti_mock_scan.py — Detecta implementações falsas/mockeadas.
+anti_mock_scan.py -- Detecta implementações falsas/mockeadas.
 Padrões detectados:
   1. Cache-stale: json.load(X.json) quando X.json é cache, não fonte real
   2. Silent-except: except Exception: return default (mascara falhas)
@@ -83,7 +83,7 @@ def scan_file(filepath):
                         "type": "SILENT_EXCEPT",
                         "file": rel,
                         "line": node.lineno,
-                        "detail": "except Exception sem log — mascara falhas",
+                        "detail": "except Exception sem log -- mascara falhas",
                     })
 
     return findings
@@ -108,7 +108,7 @@ def run():
     for t, items in sorted(by_type.items()):
         print(f"\n  {t} ({len(items)} achados):")
         for i in items[:5]:
-            print(f"    {i['file']}:{i['line']} — {i['detail']}")
+            print(f"    {i['file']}:{i['line']} -- {i['detail']}")
 
     total = len(all_findings)
     print(f"\n  TOTAL: {total} achados")

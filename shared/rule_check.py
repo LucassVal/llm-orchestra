@@ -273,7 +273,7 @@ def check_progress():
 
 
 def check_audit():
-    """Logs imutaveis — nunca "w" em arquivo de log (ERR)"""
+    """Logs imutaveis -- nunca "w" em arquivo de log (ERR)"""
     violations = []
     for py_file in BUILD.rglob("*.py"):
         skip = any(d in str(py_file) for d in ["llama.cpp", "__pycache__", ".git"])

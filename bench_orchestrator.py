@@ -1276,7 +1276,7 @@ def main():
     # ═══ RELATÓRIO ═══
     print_bench_table(all_results)
 
-    # Salva JSON (append-only — timestamp no nome, NUNCA sobrescreve)
+    # Salva JSON (append-only -- timestamp no nome, NUNCA sobrescreve)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_file = os.path.join(BUILD, "logs", f"benchmark_{ts}.json")
     output = {"run_id": run_id, "results": all_results,

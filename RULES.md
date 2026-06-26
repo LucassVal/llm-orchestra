@@ -164,6 +164,18 @@ Fatores que impactam performance (ordem de prioridade):
 4. **Modelo** (10%): tamanho/quantizacao
 5. **TTFT** (5%): prompt processing
 
+## R-BENCH-ANTIMOCK — Deteccao de Funcoes Falsas
+
+**Regra absoluta: toda funcao deve usar fonte de dados REAL, nunca cache stale.**
+
+4 padroes de auditoria:
+1. **CACHE_AS_SOURCE**: `json.load(X.json)` — X.json é cache ou fonte real? Se for cache, trocar por API/sensor.
+2. **SILENT_EXCEPT**: `except Exception: pass/return default` — mascara falhas. Deve logar o erro.
+3. **HARDCODED_DYNAMIC**: constante onde deveria ser sensor/API (ex: `max_tokens=512` fixo ignorando thermal).
+4. **STALE_SOURCE**: arquivo estático lido como verdade quando existe fonte viva (/sys, /proc, API).
+
+Ferramenta: `make antimock` → `shared/anti_mock_scan.py` (30+ achados, todos documentados).
+
 ## R-BENCH-AUDIT — Imutabilidade de Logs
 
 **Regra absoluta: logs NUNCA apagam, NUNCA sobrescrevem.**

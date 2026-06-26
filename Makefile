@@ -31,12 +31,12 @@ export OLLAMA_CONTEXT_LENGTH
 # CHECKPOINT — obrigatorio antes de qualquer acao
 # ═══════════════════════════════════════════════════════════════
 
-checkpoint: ollama lint deps rules audit seal validate
+checkpoint: ollama lint deps rules audit seal validate antimock
 	@echo ""
-	@echo "✓ CHECKPOINT: ollama + lint + deps + rules + audit + seal + validate — todos PASS"
+	@echo "✓ CHECKPOINT: ollama + lint + deps + rules + audit + seal + validate + antimock — todos PASS"
 	@echo ""
 
-ollama: ## [0/7] Ollama gate (6 envs, binary, modelos, .env)
+ollama: ## [0/8] Ollama gate (6 envs, binary, modelos, .env)
 	@cd $(BUILD) && python3 shared/ollama_gate.py
 
 lint: ## [1/6] Ruff + isort + py_check (0 erros obrigatorio)
@@ -62,8 +62,11 @@ seal: ## [5/6] Selo de integridade (hash SHA256 de arquivos criticos)
 seal-reset: ## Reseta o selo (apos mudanca intencional)
 	@cd $(BUILD) && python3 shared/seal_check.py --reset
 
-validate: ## [6/7] Validacao completa (funcoes, stubs, orfaos, contratos)
+validate: ## [6/8] Validacao completa (funcoes, stubs, orfaos, contratos)
 	@cd $(BUILD) && python3 shared/system_validate.py
+
+antimock: ## [7/8] Anti-mock scan (cache-stale, silent-except, hardcoded-dynamic)
+	@cd $(BUILD) && python3 shared/anti_mock_scan.py
 
 
 # ═══════════════════════════════════════════════════════════════

@@ -96,9 +96,21 @@ def list_recent(limit=10):
 
 
 def _read_thermal():
+    """Le sensores REAIS (nao cache antigo)."""
     try:
-        d = json.loads((BUILD / "shared" / "thermal_status.json").read_text())
-        return d.get("thermal_c", 0)
+        import glob
+        temps = []
+        for zone in glob.glob("/sys/class/thermal/thermal_zone*/temp"):
+            try:
+                zname = zone.replace("/temp", "/type")
+                with open(zname) as f:
+                    if "hw-trip" in f.read().strip() or "trip" in f.read().strip().lower():
+                        continue
+                with open(zone) as f:
+                    temps.append(int(f.read().strip()) / 1000.0)
+            except Exception:
+                pass
+        return max(temps) if temps else 0
     except Exception:
         return 0
 

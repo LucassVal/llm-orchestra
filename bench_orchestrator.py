@@ -944,8 +944,8 @@ def main():
                   "--model-size-gb", str(m.size_gb), "--server-url", server_url], 180),
             ]
             
-            for test_name, script, test_args, timeout in TESTS:
-                step_n = i * len(TESTS) + list(dict(TESTS).keys()).index(test_name) + 1
+            for step_idx, (test_name, script, test_args, timeout) in enumerate(TESTS):
+                step_n = i * len(TESTS) + step_idx + 1
                 # Dispatch log: registro PRE
                 dh = dispatch_create(
                     agent_id=m.name.replace("_", "-"),

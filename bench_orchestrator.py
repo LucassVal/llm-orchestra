@@ -80,7 +80,7 @@ MODELS[-1]._gguf_path = os.path.expanduser("~/build/Qwen_Qwen3-4B-Q4_K_M.gguf")
 BUILD        = os.path.expanduser("~/build")
 CHILD        = os.path.join(BUILD, "bench_child.py")
 BLOBS_DIR    = os.path.expanduser("~/.ollama/models/blobs")
-LOG_FILE     = os.path.join(BUILD, "logs", "bench_run.log")
+LOG_FILE     = os.path.join(BUILD, "logs", "bench_run.log")  # append-only, NUNCA truncar
 STATUS_FILE  = os.path.join(BUILD, "bench_status.json")
 RESULTS_FILE = os.path.join(BUILD, "benchmark_final.json")
 THERMAL_FILE = os.path.join(BUILD, "shared", "thermal_status.json")
@@ -747,7 +747,7 @@ def main():
     atexit.register(_cleanup_lock)
 
     run_id = trace()
-    with open(LOG_FILE, "w") as f:
+    with open(LOG_FILE, "a") as f:
         f.write(f"BENCHMARK RUN {run_id}  |  {datetime.now()}\n")
 
     tee(f"ORQUESTRADOR UNIFICADO v4 (DDD)  |  run_id={run_id}")
@@ -1238,15 +1238,22 @@ def main():
     # ═══ RELATÓRIO ═══
     print_bench_table(all_results)
 
-    # Salva JSON
+    # Salva JSON (append-only — timestamp no nome, NUNCA sobrescreve)
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_file = os.path.join(BUILD, "logs", f"benchmark_{ts}.json")
     output = {"run_id": run_id, "results": all_results,
               "timestamp": datetime.now().isoformat()}
-    with open(RESULTS_FILE, "w") as f:
+    with open(output_file, "w") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
+    # Atualiza symlink para o mais recente
+    latest = os.path.join(BUILD, "benchmark_latest.json")
+    if os.path.exists(latest):
+        os.remove(latest)
+    os.symlink(output_file, latest)
 
-    # Salva Markdown
+    # Salva Markdown (append-only)
     md = generate_markdown(all_results, run_id)
-    md_path = os.path.join(BUILD, "benchmark_report.md")
+    md_path = os.path.join(BUILD, "logs", f"benchmark_{ts}.md")
     with open(md_path, "w") as f:
         f.write(md)
 

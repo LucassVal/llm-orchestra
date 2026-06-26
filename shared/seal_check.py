@@ -46,6 +46,8 @@ SEALED = [
     # NeoCortex maker
     "../NeoCortex/maker/cmd_bench.py",
     # Agents
+    # Logs (append-only, audit trail)
+    "logs/bench_run.log",
     "../agents/agent_contract_template.json",
 ]
 

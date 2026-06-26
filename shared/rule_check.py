@@ -268,6 +268,27 @@ def check_progress():
     return True, "todas com barra"
 
 
+def check_audit():
+    """Logs imutaveis — nunca "w" em arquivo de log (ERR)"""
+    violations = []
+    for py_file in BUILD.rglob("*.py"):
+        skip = any(d in str(py_file) for d in ["llama.cpp", "__pycache__", ".git"])
+        if skip:
+            continue
+        try:
+            text = py_file.read_text()
+            # Detecta open(LOG_FILE, "w") ou open(..., "w") em contexto de log
+            for line in text.split("\n"):
+                if 'open(' in line and '"w"' in line:
+                    if any(kw in line.lower() for kw in ['log', 'benchmark', 'result']):
+                        violations.append("{}: {}".format(py_file.name, line.strip()[:60]))
+        except Exception:
+            pass
+    if violations:
+        return False, "{} log-truncations".format(len(violations))
+    return True, "logs append-only"
+
+
 CHECKS = [
     ("R-USE:System",      check_use),
     ("R-USE:RAM",         check_ram),
@@ -276,6 +297,7 @@ CHECKS = [
     ("R-USE:Thermal",     check_thermal),
     ("R-VALIDATE",        check_mirror),
     ("R-SEARCH",          check_search),
+    ("R-AUDIT",           check_audit),
     ("R-3W",              check_3w),
     ("R-ASCII",           check_ascii),
     ("R-ENV",             check_env),

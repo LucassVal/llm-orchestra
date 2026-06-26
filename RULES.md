@@ -164,6 +164,18 @@ Fatores que impactam performance (ordem de prioridade):
 4. **Modelo** (10%): tamanho/quantizacao
 5. **TTFT** (5%): prompt processing
 
+## R-BENCH-AUDIT — Imutabilidade de Logs
+
+**Regra absoluta: logs NUNCA apagam, NUNCA sobrescrevem.**
+
+- `results.json` → substituído por `logs/benchmark_YYYYMMDD_HHMMSS.json` (timestamp)
+- `bench_run.log` → sempre append (`"a"`), nunca truncar (`"w"`)
+- `benchmark_latest.json` → symlink para o mais recente
+- Violação de log = violação de auditoria = FAIL bloqueante no hook
+- Deleção de log é detectada pelo seal (hash SHA256)
+
+**NUNCA `rm results.json`. NUNCA `open(log, "w")`.**
+
 ## R-BENCH-RCA — Root Cause Analysis
 
 Metodologia de diagnostico de falhas:

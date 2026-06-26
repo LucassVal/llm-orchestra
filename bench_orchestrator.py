@@ -89,13 +89,18 @@ THERMAL_FILE = os.path.join(BUILD, "shared", "thermal_status.json")
 def get_thermal_limit(default_max_tokens=512):
     """Le sensores termicos REAIS e retorna max_tokens ajustado.
     Power-throttle: reduz tokens com temperatura, nunca bloqueia.
-    Lê /sys/class/thermal/ diretamente — NUNCA cache antigo."""
+    Exclui hw-trip (valores fixos de threshold)."""
     try:
-        # Lê temperaturas reais dos sensores
         temps = []
         import glob
         for zone in glob.glob("/sys/class/thermal/thermal_zone*/temp"):
             try:
+                zname = zone.replace("/temp", "/type")
+                with open(zname) as f:
+                    ztype = f.read().strip()
+                # Ignora hardware trip points (valores fixos, nao sensores)
+                if "hw-trip" in ztype or "trip" in ztype.lower():
+                    continue
                 with open(zone) as f:
                     temps.append(int(f.read().strip()) / 1000.0)
             except Exception:

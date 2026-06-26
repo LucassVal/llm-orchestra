@@ -979,9 +979,21 @@ def main():
                 result = run_pipeline_child(script, test_args, test_name,
                                             registry, timeout, env=test_env)
                 model_result["tests"][test_name] = result
-                # Dispatch log: registro POST
-                tok_s = result.get("summary", {}).get("avg_tok_s", 0) if isinstance(result, dict) else 0
-                dispatch_complete(dh, result.get("status", "?"), tok_s=tok_s)
+                # Dispatch log: registro POST com benchmark metrics
+                tok_s = 0
+                benchmark = None
+                if isinstance(result, dict):
+                    summary = result.get("summary", {})
+                    tok_s = summary.get("avg_tok_s", 0)
+                    battery = result if result.get("summary") else None
+                    if battery:
+                        benchmark = {
+                            "ok": summary.get("ok", 0),
+                            "total": summary.get("total", 0),
+                            "score": summary.get("score", 0),
+                            "avg_tok_s": summary.get("avg_tok_s", 0),
+                        }
+                dispatch_complete(dh, result.get("status", "?"), tok_s=tok_s, benchmark=benchmark)
                 
                 if result.get("status") == "OOM_PROTECT":
                     tee(f"  ⛔ Pipeline interrompido por OOM em {m.name}")

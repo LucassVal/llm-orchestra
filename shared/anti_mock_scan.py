@@ -45,8 +45,8 @@ def scan_file(filepath):
                 # json.load(open(X)) ou json.loads(X.read_text())
                 if func_name in ("load", "loads"):
                     for arg in node.args:
-                        if isinstance(arg, ast.Call) and isinstance(arg.func, ast.Attribute):
-                                if arg.func.attr in ("read_text", "read"):
+                        if (isinstance(arg, ast.Call) and isinstance(arg.func, ast.Attribute)
+                                and arg.func.attr in ("read_text", "read")):
                                     # Verifica se o caminho contém um cache file
                                     try:
                                         source = ast.unparse(arg.func.value)
@@ -73,9 +73,9 @@ def scan_file(filepath):
                     is_cleanup = False
                     # Heurística: se a função contém 'cleanup' ou 'stop' ou 'kill', é intencional
                     for ancestor in ast.walk(tree):
-                        if isinstance(ancestor, ast.FunctionDef) and any(kw in ancestor.name.lower() for kw in ['cleanup', 'stop', 'kill', 'atexit', 'finally']):
-                                # Verifica se o except está dentro desta função
-                                if node.lineno >= ancestor.lineno and node.end_lineno <= ancestor.end_lineno:
+                        if (isinstance(ancestor, ast.FunctionDef) and any(kw in ancestor.name.lower()
+                                for kw in ['cleanup', 'stop', 'kill', 'atexit', 'finally'])
+                                and node.lineno >= ancestor.lineno and node.end_lineno <= ancestor.end_lineno):
                                     is_cleanup = True
                                     break
                     if not is_cleanup:

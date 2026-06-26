@@ -88,7 +88,8 @@ def get_thermal_limit(default_max_tokens=512):
     Power-throttle: reduz tokens com temperatura, nunca bloqueia."""
     try:
         import json
-        d = json.loads(open(THERMAL_FILE).read())
+        with open(THERMAL_FILE) as f:
+            d = json.load(f)
         tier = d.get("tier", "full")
         limits = {"full": 512, "eco": 256, "low": 128, "minimal": 64, "idle": 16}
         return limits.get(tier, default_max_tokens)

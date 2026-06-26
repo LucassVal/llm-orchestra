@@ -162,9 +162,8 @@ def run():
             try:
                 content = py_file.read_text()
                 for other in child_dirs:
-                    if (other != child and other in content
-                            and not line.strip().startswith("#")
-                            and ("import" in line or "from" in line)):
+                    if other != child and other in content:
+                        ddd_violations += 1
             except Exception:
                 pass
     arch["ddd"] = {"status": "PASS" if ddd_violations == 0 else "FAIL", "detail": "{} violacoes".format(ddd_violations)}
@@ -258,13 +257,12 @@ def run():
     val_lines = r.stdout.split("\n")
 
     # Extrai metricas do output
-    funcs_total = funcs_real = funcs_stubs = 0
-    orphans_list = []
+    funcs_real = funcs_stubs = 0
     triad_ok = False
     seal_ok = False
     for line in val_lines:
         if "Total:" in line:
-            funcs_total = int(line.split(":")[-1].strip())
+            pass  # funcs_total — informativo
         elif "Reais:" in line:
             funcs_real = int(line.split(":")[-1].strip())
         elif "Stubs:" in line:

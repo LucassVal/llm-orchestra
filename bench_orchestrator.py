@@ -906,7 +906,7 @@ def main():
                 srv.stop()
                 continue
             
-            model_result = {"model": m.name, "gb": m.size_gb, "tests": {}}
+            model_result = {"model": m.name, "gb": m.size_gb, "tests": {}, "thermal_log": []}
             
             # ═══ Esteira de testes ═══
             TESTS = [
@@ -945,8 +945,23 @@ def main():
                 step_n = i * len(TESTS) + list(dict(TESTS).keys()).index(test_name) + 1
                 # Power-throttle: governador termico reduz tokens se necessario
                 limit = get_thermal_limit()
+                tier = "full"
+                try:
+                    import json as _j
+                    with open(THERMAL_FILE) as f:
+                        td = _j.load(f)
+                    tier = td.get("tier", "full")
+                    thermal_c = td.get("thermal_c", 0)
+                except Exception:
+                    tier = "full"
+                    thermal_c = 0
                 if limit < 512:
-                    tee("  [THROTTLE] {} → max_tokens={}".format(test_name, limit))
+                    tee("  [THROTTLE] {} → tier={} max_tokens={} temp={}C".format(
+                        test_name, tier, limit, thermal_c))
+                model_result["thermal_log"].append({
+                    "step": test_name, "tier": tier, "max_tokens": limit,
+                    "thermal_c": thermal_c, "elapsed_s": int(time.time() - pipeline_start),
+                })
                 test_env = os.environ.copy()
                 test_env["BENCH_MAX_TOKENS"] = str(limit)
                 write_status(model=m.name, step=test_name, step_n=step_n, step_total=len(models)*len(TESTS),

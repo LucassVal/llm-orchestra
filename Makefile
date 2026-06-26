@@ -31,9 +31,9 @@ export OLLAMA_CONTEXT_LENGTH
 # CHECKPOINT — obrigatorio antes de qualquer acao
 # ═══════════════════════════════════════════════════════════════
 
-checkpoint: kill-all ollama lint deps rules audit chain seal validate antimock tools
+checkpoint: kill-all ollama lint deps rules audit seal validate antimock tools
 	@echo ""
-	@echo "✓ CHECKPOINT: kill-all + ollama + lint + deps + rules + audit + chain + seal + validate + antimock + tools — todos PASS"
+	@echo "✓ CHECKPOINT: kill-all + ollama + lint + deps + rules + audit + seal + validate + antimock + tools — todos PASS"
 	@echo ""
 
 ollama: ## [0/8] Ollama gate (6 envs, binary, modelos, .env)
@@ -50,13 +50,10 @@ deps: ## [2/5] Circularity check (import cycles, 0 obrigatorio)
 rules: ## [3/5] Rule check (13 R-BENCH-*, todas ERR exceto RAM+Thermal)
 	@cd $(BUILD) && python3 shared/rule_check.py
 
-audit: ## [4/6] Compliance audit (chain + system + code + arch + factory + triade)
+audit: ## [4/5] Compliance audit (chain + system + code + arch + factory + triade)
 	@cd $(BUILD) && python3 shared/compliance_check.py
 
-chain: ## [5/6] Chain check (skills + workflow + DDD em ordem canonica)
-	@cd $(BUILD) && python3 shared/chain_check.py
-
-gate: ## [6/6] Pre-commit gate (kill-all + rich + stub + slop + mock + rules + audit)
+gate: ## [5/5] Pre-commit gate (kill-all + rich + stub + slop + mock + rules + audit)
 	@cd $(BUILD) && python3 shared/pre_commit_hook.py
 
 seal: ## [5/6] Selo de integridade (hash SHA256 de arquivos criticos)

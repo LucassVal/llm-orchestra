@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # 3W: WHAT=validacao completa sistema | WHY=detectar stubs/orfaos/funcoes vazias | WHEN=checkpoint
 """
-system_validate.py — Validacao completa do ecossistema.
+system_validate.py -- Validacao completa do ecossistema.
 Verifica:
   1. Funcoes reais vs stubs (corpo vazio, pass, return None)
   2. Contratos triade (Makefile ↔ maker ↔ ps1)

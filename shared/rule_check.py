@@ -48,13 +48,13 @@ def check_use():
     # 4. Daemon
     if not (BUILD/".metrics_daemon.pid").exists():
         issues.append("daemon parado")
-    # 5. Thermal (WARN — governador gerencia)
+    # 5. Thermal (WARN -- governador gerencia)
     tf = BUILD/"shared"/"thermal_status.json"
     if tf.exists():
         try:
             d = json.loads(tf.read_text())
             if d.get("thermal_c", 105) > 95:
-                pass  # nao bloqueia — governador gerencia
+                pass  # nao bloqueia -- governador gerencia
         except Exception:
             pass
     if issues:
@@ -79,7 +79,7 @@ def check_mirror():
 # ═══════════════════════════════════════════════════════════════
 
 def check_ram():
-    """RAM (WARN — orquestrador gerencia)"""
+    """RAM (WARN -- orquestrador gerencia)"""
     r = _run(["free", "-m"])
     for line in r.stdout.split("\n"):
         if "Mem:" in line:
@@ -92,7 +92,7 @@ def check_ram():
 
 
 def check_ollama():
-    """ollama list — 3 modelos (ERR)"""
+    """ollama list -- 3 modelos (ERR)"""
     r = _run(["ollama", "list"])
     count = len([line for line in r.stdout.split("\n") if line.strip()]) - 1
     if count < 3:

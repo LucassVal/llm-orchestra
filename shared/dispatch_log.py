@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # 3W: WHAT=dispatch log v1.0 | WHY=serie historica de disparos | WHEN=toda acao agente/teste
 """
-dispatch_log.py v1.0 — Serie historica de disparos.
+dispatch_log.py v1.0 -- Serie historica de disparos.
 Cada disparo: hash unico + modelo LLM + benchmark metrics + thermal + RAM + timestamp.
 Formato canonico para auditoria e serie temporal.
 """
@@ -117,7 +117,7 @@ def _read_ram():
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2:
-        print("dispatch_log.py v1.0 — Serie historica de disparos")
+        print("dispatch_log.py v1.0 -- Serie historica de disparos")
         print("  create <agent> <function> [model] [profile]")
         print("  complete <hash> <status> [tok_s]")
         print("  fail <hash> <error>")

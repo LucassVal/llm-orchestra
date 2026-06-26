@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # 3W: WHAT=compliance audit | WHY=verificar integridade ecossistema | WHEN=checkpoint/commit
 """
-compliance_check.py v3 — Auditoria de conformidade por categorias.
+compliance_check.py v3 -- Auditoria de conformidade por categorias.
 Categorias: SYSTEM, CODE, ARCHITECTURE, TRIADE, SEAL.
 Cada categoria tem sub-checks. Total: ~25 checks.
 """
@@ -29,7 +29,7 @@ def run():
     tstamp = datetime.now().strftime("%H:%M:%S")
 
     # ═══════════════════════════════════════════════════════
-    # SYSTEM — Infraestrutura operacional
+    # SYSTEM -- Infraestrutura operacional
     # ═══════════════════════════════════════════════════════
     system = {}
 
@@ -73,7 +73,7 @@ def run():
     results["SYSTEM"] = system
 
     # ═══════════════════════════════════════════════════════
-    # CODE — Qualidade de codigo
+    # CODE -- Qualidade de codigo
     # ═══════════════════════════════════════════════════════
     code = {}
 
@@ -129,7 +129,7 @@ def run():
     results["CODE"] = code
 
     # ═══════════════════════════════════════════════════════
-    # ARCHITECTURE — Design e estrutura
+    # ARCHITECTURE -- Design e estrutura
     # ═══════════════════════════════════════════════════════
     arch = {}
 
@@ -206,7 +206,7 @@ def run():
     results["ARCHITECTURE"] = arch
 
     # ═══════════════════════════════════════════════════════
-    # TRIADE — Espelhamento e integracao
+    # TRIADE -- Espelhamento e integracao
     # ═══════════════════════════════════════════════════════
     triade = {}
 
@@ -253,7 +253,7 @@ def run():
     results["TRIADE"] = triade
 
     # ═══════════════════════════════════════════════════════
-    # VALIDATION — Funcoes, testes, cobertura
+    # VALIDATION -- Funcoes, testes, cobertura
     # ═══════════════════════════════════════════════════════
     r = subprocess.run(
         [sys.executable, str(BUILD/"shared"/"system_validate.py")],
@@ -267,7 +267,7 @@ def run():
     seal_ok = False
     for line in val_lines:
         if "Total:" in line:
-            pass  # funcs_total — informativo
+            pass  # funcs_total -- informativo
         elif "Reais:" in line:
             funcs_real = int(line.split(":")[-1].strip())
         elif "Stubs:" in line:
@@ -301,7 +301,7 @@ def run():
     # ═══════════════════════════════════════════════════════
     # OUTPUT
     # ═══════════════════════════════════════════════════════
-    print("COMPLIANCE AUDIT v3 — " + tstamp)
+    print("COMPLIANCE AUDIT v3 -- " + tstamp)
     total_pass = 0
     total_fail = 0
 

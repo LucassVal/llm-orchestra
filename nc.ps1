@@ -21,6 +21,7 @@ function install { pip install -q ruff isort pytest mock aislop; Push-Location $
 function lint { Push-Location $BUILD; ruff check . --exclude llama.cpp; isort --check-only --diff . --skip llama.cpp --skip __pycache__; Pop-Location }
 function gate { Push-Location $BUILD; python shared/pre_commit_hook.py; Pop-Location }
 function rules { Push-Location $BUILD; python shared/rule_check.py; Pop-Location }
+function dispatch { Push-Location $BUILD; python shared/dispatch_log.py list; Pop-Location }
 
 function status { Push-Location $BUILD; python meta_orchestrator.py --status; Pop-Location }
 function stop { Push-Location $BUILD; python meta_orchestrator.py --stop; Pop-Location }
@@ -52,6 +53,7 @@ switch ($Command) {
     "deps" { deps }
     "gate" { gate }
     "rules" { rules }
+    "dispatch" { dispatch }
     "status" { status }
     "stop" { stop }
     "pipeline-4b" { pipeline-4b }

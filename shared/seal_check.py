@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # 3W: WHAT=selo integridade sistema | WHY=detectar violacoes e auto-reparar | WHEN=todo checkpoint
 """
-seal_check.py — Selo de integridade do ecossistema.
+seal_check.py -- Selo de integridade do ecossistema.
 Computa hash SHA256 de arquivos criticos e compara com selo salvo.
 Se violado: tenta auto-reparo via git checkout do ultimo commit.
 Se irreparavel: bloqueia tudo e instrui IA a alertar operador.
@@ -100,12 +100,12 @@ def run():
     saved = load_seal()
     if saved is None:
         seal = save_seal()
-        print("SEAL: criado (primeiro selo) — {}".format(seal[:16]))
+        print("SEAL: criado (primeiro selo) -- {}".format(seal[:16]))
         return 0
 
     current = compute_seal()
     if current == saved:
-        print("SEAL: INTEGRO — {}".format(current[:16]))
+        print("SEAL: INTEGRO -- {}".format(current[:16]))
         return 0
 
     # Violacao detectada
@@ -113,7 +113,7 @@ def run():
     print("  salvo:   {}".format(saved[:16]))
     print("  atual:   {}".format(current[:16]))
     print()
-    print("⛔ SELO QUEBRADO — tentando auto-reparo via git...")
+    print("⛔ SELO QUEBRADO -- tentando auto-reparo via git...")
     ok, msg = auto_repair()
     if ok:
         print("✓ {}".format(msg))
@@ -131,6 +131,6 @@ def run():
 if __name__ == "__main__":
     if "--reset" in sys.argv:
         seal = save_seal()
-        print("SEAL: resetado — {}".format(seal[:16]))
+        print("SEAL: resetado -- {}".format(seal[:16]))
         sys.exit(0)
     sys.exit(run())

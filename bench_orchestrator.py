@@ -279,8 +279,8 @@ def cleanup_after_model(model_name: str = ""):
 # SERVER MANAGER -- Orquestrador é DONO do ciclo de vida do servidor
 # ═══════════════════════════════════════════════════════════════════
 
-DEFAULT_SERVER_BIN = os.path.expanduser("~/llama.cpp/build/bin/llama-server")
-DEFAULT_LD_PATH    = os.path.expanduser("~/llama.cpp/build/bin")
+DEFAULT_SERVER_BIN = "/data/data/com.termux/files/usr/lib/ollama/llama-server"
+DEFAULT_LD_PATH    = "/data/data/com.termux/files/usr/lib/ollama"
 OLLAMA_SERVER_BIN  = "/data/data/com.termux/files/usr/lib/ollama/llama-server"
 OLLAMA_LD_PATH     = "/data/data/com.termux/files/usr/lib/ollama"
 

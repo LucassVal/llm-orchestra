@@ -129,10 +129,10 @@ PROMPTS = [
 # INFRASTRUCTURE -- Paths & Constantes
 # ═══════════════════════════════════════════════════════════════════
 
-LLAMA_CLI    = os.path.expanduser("~/llama.cpp/build/bin/llama-cli")
-LLAMA_SERVER = os.path.expanduser("~/llama.cpp/build/bin/llama-server")
-LD_CLI       = os.path.expanduser("~/llama.cpp/build/bin")
-LD_SERVER    = os.path.expanduser("~/llama.cpp/build/bin")
+LLAMA_CLI    = "/data/data/com.termux/files/usr/lib/ollama/llama-server"
+LLAMA_SERVER = "/data/data/com.termux/files/usr/lib/ollama/llama-server"
+LD_CLI       = "/data/data/com.termux/files/usr/lib/ollama"
+LD_SERVER    = "/data/data/com.termux/files/usr/lib/ollama"
 SERVER_URL   = "http://127.0.0.1:8080"
 
 THREADS  = 6

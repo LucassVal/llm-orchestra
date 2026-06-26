@@ -14,8 +14,8 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-LLAMA_CLI = os.path.expanduser("~/llama.cpp/build/bin/llama-cli")
-LD_PATH   = os.path.expanduser("~/llama.cpp/build/bin")
+LLAMA_CLI = "/data/data/com.termux/files/usr/lib/ollama/llama-server"
+LD_PATH   = "/data/data/com.termux/files/usr/lib/ollama"
 BUILD     = os.path.expanduser("~/build")
 
 

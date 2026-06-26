@@ -1,9 +1,8 @@
 # This function does the thing
+import contextlib
 def foo():
     """This is a helper that does the calculation step by step"""
-    try:
-        x = 1/0
-    except:
+    with contextlib.suppress(BaseException):
         pass
     # TODO: implement later
     return None

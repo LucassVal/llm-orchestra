@@ -31,10 +31,13 @@ export OLLAMA_CONTEXT_LENGTH
 # CHECKPOINT — obrigatorio antes de qualquer acao
 # ═══════════════════════════════════════════════════════════════
 
-checkpoint: lint deps rules audit seal validate
+checkpoint: ollama lint deps rules audit seal validate
 	@echo ""
-	@echo "✓ CHECKPOINT: lint + deps + rules + audit + seal + validate — todos PASS"
+	@echo "✓ CHECKPOINT: ollama + lint + deps + rules + audit + seal + validate — todos PASS"
 	@echo ""
+
+ollama: ## [0/7] Ollama gate (6 envs, binary, modelos, .env)
+	@cd $(BUILD) && python3 shared/ollama_gate.py
 
 lint: ## [1/6] Ruff + isort + py_check (0 erros obrigatorio)
 	@cd $(BUILD) && ruff check . --exclude llama.cpp && \

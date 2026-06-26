@@ -1,0 +1,16 @@
+{# profile.json.jinja — Template de perfil de LLM #}
+{
+  "_schema": "llm_profile_v1",
+  "_trace": "{{ trace }}",
+  "name": "{{ name }}",
+  "params": {
+    "temperature": {{ temperature }},
+    "max_tokens": {{ max_tokens }},
+    "context_length": {{ context }}
+  },
+  "use_cases": [
+    {% for case in use_cases %}
+    "{{ case }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}

@@ -1,0 +1,23 @@
+{# partials/agent_run.py.jinja — execucao do agente #}
+def run(prompt: str) -> dict:
+    """Executa prompt no modelo configurado."""
+    import json
+    import subprocess
+
+    config = init()
+    payload = json.dumps({
+        "model": config["model"],
+        "prompt": prompt,
+        "stream": False,
+    })
+    result = subprocess.run(
+        ["ollama", "run", config["model"], prompt],
+        capture_output=True, text=True, timeout=120,
+    )
+    return {
+        "agent_id": config["agent_id"],
+        "model": config["model"],
+        "profile": config["profile"],
+        "response": result.stdout.strip(),
+        "status": "OK" if result.returncode == 0 else "ERR",
+    }

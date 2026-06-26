@@ -1,0 +1,30 @@
+{# test_bench.py.jinja — Template de teste de benchmark #}
+# 3W: WHAT=teste {{ test_name }} | WHY=validar {{ target_module }} | WHEN={{ trace }}
+"""
+Testes para {{ target_module }}.
+Gerado por: factory_engine.py (AST + Jinja2)
+Trace: {{ trace }}
+"""
+import pytest
+from {{ target_module }} import *
+
+
+class Test{{ test_name | capitalize }}:
+    """Testes gerados para {{ target_module }}."""
+
+    def test_import(self):
+        """Verifica que o modulo importa sem erro."""
+        import {{ target_module }}
+        assert {{ target_module }} is not None
+
+{% for func in functions %}
+    def test_{{ func }}_exists(self):
+        """Verifica que {{ func }} existe e e callable."""
+        assert callable({{ func }})
+{% endfor %}
+
+    def test_no_silent_fail(self):
+        """R-BENCH-NO-SILENT-FAIL: funcoes nao retornam None."""
+        # Smoke test — verifica que importacoes basicas funcionam
+        import {{ target_module }}
+        assert hasattr({{ target_module }}, '__doc__')

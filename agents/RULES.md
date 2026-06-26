@@ -1,4 +1,4 @@
-# RULES.md — Manifesto dos Agentes
+# RULES.md -- Manifesto dos Agentes
 # Autoridade: RULES.md (T1) > manifestos locais
 # Pasta: definicoes JSON de agentes, fabrica em shared/agent_factory.py
 

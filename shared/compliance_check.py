@@ -176,7 +176,7 @@ def run():
         "bench_creative.py", "bench_ppl.py", "bench_sweep.py",
         "bench_sys.py", "bench_temp_sweep.py",
         "Qwen_Qwen3-4B-Q4_K_M.gguf",
-        "benchmark_pipeline.json", "bench_status.json",
+        "benchmark_pipeline.json", "bench_status.json", "benchmark_latest.json",
         ".metrics_daemon.pid", ".env", ".env.make", ".seal",
     }
     orphan_count = 0

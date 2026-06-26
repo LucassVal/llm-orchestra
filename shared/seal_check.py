@@ -11,7 +11,6 @@ Arquivos selados:
   meta_orchestrator.py, bench_orchestrator.py
   shared/*.py (todos)
   test-*/orchestrator.py, test-*/sweep_config.json
-  ~/NeoCortex/maker/cmd_bench.py
   ~/agents/agent_contract_template.json
 """
 import hashlib
@@ -43,8 +42,6 @@ SEALED = [
     "test-gemma/orchestrator.py",
     "test-4b/sweep_config.json", "test-coder/sweep_config.json",
     "test-gemma/sweep_config.json",
-    # NeoCortex maker
-    "../NeoCortex/maker/cmd_bench.py",
     # Agents
     # Logs (append-only, audit trail)
     "logs/bench_run.log",

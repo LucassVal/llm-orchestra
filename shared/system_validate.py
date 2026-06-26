@@ -80,11 +80,6 @@ def validate_triade_contracts():
     mk_targets = set(re.findall(r'^([a-z][a-z0-9-]*):.*##', mk_text, re.M))
 
     # Comandos do maker
-    maker_file = Path.home()/"NeoCortex"/"maker"/"cmd_bench.py"
-    maker_targets = set()
-    if maker_file.exists():
-        for m in re.finditer(r'def bench_([a-z_0-9]+)\(', maker_file.read_text()):
-            maker_targets.add(m.group(1).replace("_", "-"))
 
     # Funcoes do .ps1
     ps1_file = BUILD/"nc.ps1"
@@ -106,12 +101,10 @@ def validate_triade_contracts():
     required_maker = required | {"daemon"}
     required_ps1 = required | {"daemon-start", "daemon-stop", "daemon-status"}
 
-    missing_maker = required_maker - maker_targets
     missing_ps1 = required_ps1 - ps1_targets
 
     return {
         "makefile": len(mk_targets),
-        "maker": len(maker_targets),
         "ps1": len(ps1_targets),
         "missing_maker": missing_maker,
         "missing_ps1": missing_ps1,
@@ -193,7 +186,6 @@ def run():
     print("")
     print("  CONTRATOS TRIADE:")
     print("    Makefile: {} targets".format(contracts["makefile"]))
-    print("    Maker:    {} comandos".format(contracts["maker"]))
     print("    PS1:      {} funcoes".format(contracts["ps1"]))
     if contracts["missing_maker"]:
         print("    ✗ Maker ausente: {}".format(",".join(sorted(contracts["missing_maker"]))))

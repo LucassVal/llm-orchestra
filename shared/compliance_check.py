@@ -62,8 +62,8 @@ def run():
         try:
             d = json.loads(tf.read_text())
             thermal_detail = "{}C".format(d.get("thermal_c", "?"))
-        except Exception:
-            pass
+    except Exception as e:
+        except_pass("compliance_check", "profile_check", str(e)[:60])
     system["thermal"] = {"status": "PASS", "detail": thermal_detail}
 
     # Env

@@ -61,8 +61,8 @@ def scan_file(filepath):
                                                     "detail": f"Le {cf} como fonte (cache, nao real)",
                                                     "source": source[:60],
                                                 })
-                                    except Exception:
-                                        pass
+                                    except Exception as e:
+                                        except_pass("anti_mock", "ast_parse", str(e)[:60])
 
         # Padrão 2: except Exception com pass PURO (sem return/fallback)
         if isinstance(node, ast.ExceptHandler):

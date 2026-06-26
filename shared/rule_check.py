@@ -274,7 +274,7 @@ def check_progress():
 
 
 def check_chain():
-    """Skills e workflows em cadeia canonica (ERR — R-BENCH-CHAIN)"""
+    """Skills e workflows em cadeia canonica (ERR -- R-BENCH-CHAIN)"""
     import subprocess
     r = subprocess.run(
         [sys.executable, str(BUILD/"shared"/"chain_check.py")],

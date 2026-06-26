@@ -4,7 +4,7 @@
 kill_all.py -- Mata TODOS os processos relacionados ao bench-llm.
 Alcance: llama-server, bench_*.py, orchestrator.py, ollama serve.
 Nao afeta cron jobs (sandbox separado).
-ERR obrigatorio no gate — sempre roda antes de commit.
+ERR obrigatorio no gate -- sempre roda antes de commit.
 """
 import os
 import signal
@@ -67,8 +67,8 @@ def run():
     if killed:
         print(f"  KILL-ALL: {len(killed)} processos orfaos mortos:")
         for pid, pattern, cmd in killed:
-            print(f"    PID {pid}: {pattern} — {cmd}")
-        # Sucesso — processos zumbis removidos
+            print(f"    PID {pid}: {pattern} -- {cmd}")
+        # Sucesso -- processos zumbis removidos
         return 0
     else:
         print("  KILL-ALL: limpo (0 orfaos)")

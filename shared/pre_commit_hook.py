@@ -154,7 +154,7 @@ def main():
 
     # ── KILL-ALL (ERR obrigatorio) ──
     print("=" * 70)
-    print("  KILL-ALL — Processos orfaos")
+    print("  KILL-ALL -- Processos orfaos")
     print("=" * 70)
     print(kill_out)
     print()

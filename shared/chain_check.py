@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # 3W: WHAT=chain validator | WHY=garantir que skills/workflows respeitam hierarquia DDD | WHEN=checkpoint/commit
 """
-chain_check.py — Validador de cadeia de skills e workflows.
+chain_check.py -- Validador de cadeia de skills e workflows.
 Verifica que:
   1. Skills sao carregadas em ordem canonica (bench-llm → agent-workflow → compliance-audit → dev-workflow → python-audit)
   2. Workflows respeitam DDD: meta → children → leaf scripts
   3. Nenhum script chama outro fora da hierarquia (chain break)
   4. Nenhum bypass de nivel (LEVEL 2 chamando LEVEL 0 diretamente)
-ERR obrigatorio — chain quebrada bloqueia checkpoint.
+ERR obrigatorio -- chain quebrada bloqueia checkpoint.
 """
 import ast
 import sys

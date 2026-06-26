@@ -131,6 +131,7 @@ def run_rich_check():
     sys.path.insert(0, str(BUILD))
     try:
         import rich  # noqa: F401
+
         import shared.display  # noqa: F401
         from shared.display import panel, thermal_gauge
         panel("RICH CHECK", "display funcional")

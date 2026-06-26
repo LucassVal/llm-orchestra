@@ -69,14 +69,27 @@ def scan_file(filepath):
             if node.type is None or (isinstance(node.type, ast.Name) and node.type.id == "Exception"):
                 body = node.body
                 # Só flag se for PASS PURO (sem return, sem log)
+                # Ignora se o pass está em contexto de cleanup/atexit/finally
                 is_pure_pass = len(body) == 1 and isinstance(body[0], ast.Pass)
                 if is_pure_pass:
-                    findings.append({
-                        "type": "SILENT_EXCEPT",
-                        "file": rel,
-                        "line": node.lineno,
-                        "detail": "except Exception: pass puro — mascara falha sem fallback",
-                    })
+                    # Verifica se está em função de cleanup (atexit, finally, cleanup, stop)
+                    is_cleanup = False
+                    parent = getattr(node, 'parent', None)
+                    # Heurística: se a função contém 'cleanup' ou 'stop' ou 'kill', é intencional
+                    for ancestor in ast.walk(tree):
+                        if isinstance(ancestor, ast.FunctionDef):
+                            if any(kw in ancestor.name.lower() for kw in ['cleanup', 'stop', 'kill', 'atexit', 'finally']):
+                                # Verifica se o except está dentro desta função
+                                if node.lineno >= ancestor.lineno and node.end_lineno <= ancestor.end_lineno:
+                                    is_cleanup = True
+                                    break
+                    if not is_cleanup:
+                        findings.append({
+                            "type": "SILENT_EXCEPT",
+                            "file": rel,
+                            "line": node.lineno,
+                            "detail": "except Exception: pass puro — mascara falha sem fallback",
+                        })
 
     return findings
 

@@ -175,8 +175,8 @@ def discover_models():
                                     blob_hash=digest, size_gb=gb,
                                     risky=(gb > 7.0))
                             break
-        except Exception as e:
-            except_pass("bench_orchestrator", "kill_stray", str(e)[:60])
+                except Exception:
+                    pass
     
     # 2. GGUF files soltos em ~/build/
     build_dir = os.path.expanduser("~/build")
@@ -249,8 +249,8 @@ def cleanup_after_model(model_name: str = ""):
                 tee(f"  [CLEANUP] ollama stop {ollama_model}")
                 subprocess.run(["ollama", "stop", ollama_model],
                                capture_output=True, timeout=10)
-    except Exception as e:
-        except_pass("bench_orchestrator", "ollama_stop", str(e)[:60])
+    except Exception:
+        pass
     
     # ═══ FASE 3: Libera porta 8080 ═══
     subprocess.run(["fuser", "-k", "8080/tcp"], capture_output=True, timeout=3)
@@ -261,8 +261,8 @@ def cleanup_after_model(model_name: str = ""):
         subprocess.run(["sync"], capture_output=True, timeout=5)
         with open("/proc/sys/vm/drop_caches", "w") as f:
             f.write("3\n")
-    except Exception as e:
-        except_pass("bench_orchestrator", "drop_caches", str(e)[:60])
+    except Exception:
+        pass
     
     # ═══ FASE 5: Aguarda RAM estabilizar e verifica ═══
     time.sleep(2)
@@ -273,8 +273,8 @@ def cleanup_after_model(model_name: str = ""):
                     avail_mb = int(line.split()[1]) // 1024
                     tee(f"  [CLEANUP] RAM após limpeza: {avail_mb}MB disponíveis")
                     break
-    except Exception as e:
-        except_pass("bench_orchestrator", "cleanup_ram", str(e)[:60])
+    except Exception:
+        pass
 
 # ═══════════════════════════════════════════════════════════════════
 # SERVER MANAGER -- Orquestrador é DONO do ciclo de vida do servidor
@@ -441,8 +441,8 @@ def decay_shutdown(registry: ProcessRegistry, reason: str = ""):
             parts = line.split()
             if parts:
                 subprocess.run(["ollama", "stop", parts[0]], capture_output=True, timeout=10)
-        except Exception as e:
-            except_pass("bench_orchestrator", "subprocess_error", str(e)[:60])
+    except Exception:
+        pass
     
     # Fase 4: fuser + drop_caches
     subprocess.run(["fuser", "-k", "8080/tcp"], capture_output=True, timeout=3)
@@ -451,8 +451,8 @@ def decay_shutdown(registry: ProcessRegistry, reason: str = ""):
         subprocess.run(["sync"], capture_output=True, timeout=5)
         with open("/proc/sys/vm/drop_caches", "w") as f:
             f.write("3\n")
-        except Exception as e:
-            except_pass("bench_orchestrator", "result_parse", str(e)[:60])
+    except Exception:
+        pass
     
     time.sleep(1)
     tee(f"  [DECAY] Completo. RAM: {free_ram_mb()}MB")
@@ -881,8 +881,8 @@ def main():
                             try:
                                 raw = int(z.read_text().strip())
                                 temps.append(raw / 1000.0)
-                    except Exception as e:
-                        except_pass("bench_orchestrator", "server_start", str(e)[:60])
+                            except Exception:
+                                pass
                         thermal_c = max(temps) if temps else 0
                     else:
                         thermal_c = 0

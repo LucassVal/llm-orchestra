@@ -62,8 +62,8 @@ def run():
         try:
             d = json.loads(tf.read_text())
             thermal_detail = "{}C".format(d.get("thermal_c", "?"))
-    except Exception as e:
-        except_pass("compliance_check", "profile_check", str(e)[:60])
+        except Exception:
+            pass
     system["thermal"] = {"status": "PASS", "detail": thermal_detail}
 
     # Env
@@ -164,8 +164,8 @@ def run():
                 for other in child_dirs:
                     if other != child and other in content:
                         ddd_violations += 1
-            except Exception as e:
-                except_pass("compliance_check", "profile_parse", str(e)[:60])
+            except Exception:
+                pass
     arch["ddd"] = {"status": "PASS" if ddd_violations == 0 else "FAIL", "detail": "{} violacoes".format(ddd_violations)}
 
     # Orphans

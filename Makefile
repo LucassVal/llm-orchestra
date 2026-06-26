@@ -31,9 +31,9 @@ export OLLAMA_CONTEXT_LENGTH
 # CHECKPOINT — obrigatorio antes de qualquer acao
 # ═══════════════════════════════════════════════════════════════
 
-checkpoint: ollama lint deps rules audit seal validate antimock
+checkpoint: ollama lint deps rules audit seal validate antimock tools
 	@echo ""
-	@echo "✓ CHECKPOINT: ollama + lint + deps + rules + audit + seal + validate + antimock — todos PASS"
+	@echo "✓ CHECKPOINT: ollama + lint + deps + rules + audit + seal + validate + antimock + tools — todos PASS"
 	@echo ""
 
 ollama: ## [0/8] Ollama gate (6 envs, binary, modelos, .env)
@@ -65,8 +65,11 @@ seal-reset: ## Reseta o selo (apos mudanca intencional)
 validate: ## [6/8] Validacao completa (funcoes, stubs, orfaos, contratos)
 	@cd $(BUILD) && python3 shared/system_validate.py
 
-antimock: ## [7/8] Anti-mock scan (cache-stale, silent-except, hardcoded-dynamic)
+antimock: ## [7/9] Anti-mock scan (cache-stale, silent-except)
 	@cd $(BUILD) && python3 shared/anti_mock_scan.py
+
+tools: ## [8/9] Ferramentas externas (smellcheck + vulture + deadcode)
+	@cd $(BUILD) && python3 shared/tools_gate.py
 
 
 # ═══════════════════════════════════════════════════════════════

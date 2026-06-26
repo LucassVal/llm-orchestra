@@ -1,0 +1,36 @@
+{
+  "run_id": "5fd08a51-cda0-42f8-9813-8a8e9424303e",
+  "mode": "stress",
+  "results": [
+    {
+      "model": "Qwen_Qwen3-4B-Q4_K_M",
+      "gb": 2.3,
+      "phases": {
+        "COLD": {
+          "avg_tok_s": 11.0,
+          "avg_ttft_ms": 707.0,
+          "max_temp_c": 0,
+          "runs": 1,
+          "status": "OK"
+        },
+        "SUSTAINED": {
+          "avg_tok_s": 10.4,
+          "avg_ttft_ms": 5700.0,
+          "max_temp_c": 0,
+          "runs": 5,
+          "status": "OK"
+        },
+        "STRESS": {
+          "avg_tok_s": 10.4,
+          "avg_ttft_ms": 6362.0,
+          "max_temp_c": 0,
+          "runs": 1,
+          "status": "OK"
+        }
+      },
+      "status": "OK",
+      "child_elapsed_s": 51.0
+    }
+  ],
+  "timestamp": "2026-06-26T13:13:36.456948"
+}

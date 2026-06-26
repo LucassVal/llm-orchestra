@@ -101,8 +101,7 @@ def check_ddd_chain():
         try:
             tree = ast.parse(py_file.read_text())
             for node in ast.walk(tree):
-                if isinstance(node, ast.ImportFrom) and node.module:
-                    if node.module.startswith("shared"):
+                if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith("shared"):
                         violations.append(
                             f"{py_file.name}: importa shared ({node.module}) — LEVEL 2 nao pode importar LEVEL 1"
                         )
@@ -122,8 +121,7 @@ def check_ddd_chain():
             try:
                 tree = ast.parse(orch.read_text())
                 for node in ast.walk(tree):
-                    if isinstance(node, ast.ImportFrom) and node.module:
-                        if "meta_orchestrator" in node.module:
+                    if isinstance(node, ast.ImportFrom) and node.module and "meta_orchestrator" in node.module:
                             violations.append(
                                 f"{model_dir}/orchestrator.py: importa meta_orchestrator — LEVEL 1 nao pode importar LEVEL 0"
                             )

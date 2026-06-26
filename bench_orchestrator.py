@@ -1042,9 +1042,16 @@ def main():
         
         output = {"run_id": run_id, "mode": "pipeline", "results": pipeline_results,
                   "timestamp": datetime.now().isoformat()}
-        pipe_file = os.path.join(BUILD, "benchmark_pipeline.json")
+        # Append-only: timestamp no nome, NUNCA sobrescreve
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        pipe_file = os.path.join(BUILD, "logs", f"benchmark_{ts}.json")
         with open(pipe_file, "w") as f:
             json.dump(output, f, ensure_ascii=False, indent=2)
+        # Symlink para o mais recente
+        latest = os.path.join(BUILD, "benchmark_latest.json")
+        if os.path.exists(latest):
+            os.remove(latest)
+        os.symlink(pipe_file, latest)
         tee(f"JSON salvo: {pipe_file}")
         tee("PIPELINE CONCLUIDO.")
         return

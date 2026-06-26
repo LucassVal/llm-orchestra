@@ -284,8 +284,7 @@ def check_audit():
             text = py_file.read_text()
             # Detecta open(LOG_FILE, "w") ou open(..., "w") em contexto de log
             for line in text.split("\n"):
-                if 'open(' in line and '"w"' in line:
-                    if any(kw in line.lower() for kw in ['log', 'benchmark', 'result']):
+                if 'open(' in line and '"w"' in line and any(kw in line.lower() for kw in ['log', 'benchmark', 'result']):
                         violations.append("{}: {}".format(py_file.name, line.strip()[:60]))
         except Exception:
             pass

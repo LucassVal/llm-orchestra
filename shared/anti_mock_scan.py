@@ -40,14 +40,12 @@ def scan_file(filepath):
 
     for node in ast.walk(tree):
         # Padrão 1: json.load(open) de arquivo cache
-        if isinstance(node, ast.Call):
-            if isinstance(node.func, ast.Attribute):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
                 func_name = node.func.attr if isinstance(node.func, ast.Attribute) else ""
                 # json.load(open(X)) ou json.loads(X.read_text())
                 if func_name in ("load", "loads"):
                     for arg in node.args:
-                        if isinstance(arg, ast.Call):
-                            if isinstance(arg.func, ast.Attribute):
+                        if isinstance(arg, ast.Call) and isinstance(arg.func, ast.Attribute):
                                 if arg.func.attr in ("read_text", "read"):
                                     # Verifica se o caminho contém um cache file
                                     try:
@@ -65,8 +63,7 @@ def scan_file(filepath):
                                         pass
 
         # Padrão 2: except Exception com pass PURO (sem return/fallback)
-        if isinstance(node, ast.ExceptHandler):
-            if node.type is None or (isinstance(node.type, ast.Name) and node.type.id == "Exception"):
+        if isinstance(node, ast.ExceptHandler) and (node.type is None or (isinstance(node.type, ast.Name) and node.type.id == "Exception")):
                 body = node.body
                 # Só flag se for PASS PURO (sem return, sem log)
                 # Ignora se o pass está em contexto de cleanup/atexit/finally
@@ -76,8 +73,7 @@ def scan_file(filepath):
                     is_cleanup = False
                     # Heurística: se a função contém 'cleanup' ou 'stop' ou 'kill', é intencional
                     for ancestor in ast.walk(tree):
-                        if isinstance(ancestor, ast.FunctionDef):
-                            if any(kw in ancestor.name.lower() for kw in ['cleanup', 'stop', 'kill', 'atexit', 'finally']):
+                        if isinstance(ancestor, ast.FunctionDef) and any(kw in ancestor.name.lower() for kw in ['cleanup', 'stop', 'kill', 'atexit', 'finally']):
                                 # Verifica se o except está dentro desta função
                                 if node.lineno >= ancestor.lineno and node.end_lineno <= ancestor.end_lineno:
                                     is_cleanup = True

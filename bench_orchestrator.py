@@ -321,7 +321,7 @@ class ServerManager:
                 tee(f"  [SERVER] ONLINE em {i+1}s -- {self.url}")
                 return self.url
             except Exception as e:
-                except_pass("bench_orchestrator", "get_thermal_limit", str(e)[:60])
+                except_pass("bench_orchestrator", "server_start_health", str(e)[:60])
         
         self._proc.terminate()
         raise RuntimeError(f"Servidor nao respondeu /health em {timeout}s")
@@ -548,7 +548,7 @@ def preflight_llamaserver(gguf: str) -> tuple:
                 ur.urlopen("http://127.0.0.1:8080/health", timeout=2)
                 break
             except Exception as e:
-                except_pass("bench_orchestrator", "get_thermal_limit", str(e)[:60])
+                except_pass("bench_orchestrator", "cleanup_health_check", str(e)[:60])
         else:
             return "FAIL", "servidor nao subiu"
 

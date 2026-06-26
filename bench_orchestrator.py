@@ -14,6 +14,8 @@ Camadas: Domain → Application → Infrastructure → Presentation
 Regras: R-TRACE, R-NO-SILENT-FAIL, R-IDEMPOTENT, R-KISS, R-PYTHON-FIRST.
 """
 import json
+from shared.debug_log import except_pass
+
 import os
 import signal as _signal
 import subprocess
@@ -103,8 +105,8 @@ def get_thermal_limit(default_max_tokens=512):
                     continue
                 with open(zone) as f:
                     temps.append(int(f.read().strip()) / 1000.0)
-            except Exception:
-                pass
+            except Exception as e:
+                except_pass("bench_orchestrator", "get_thermal_limit", str(e)[:60])
         if not temps:
             return default_max_tokens
         thermal_c = max(temps)
@@ -318,8 +320,8 @@ class ServerManager:
                 urllib.request.urlopen(f"{self.url}/health", timeout=2)
                 tee(f"  [SERVER] ONLINE em {i+1}s -- {self.url}")
                 return self.url
-            except Exception:
-                pass
+            except Exception as e:
+                except_pass("bench_orchestrator", "get_thermal_limit", str(e)[:60])
         
         self._proc.terminate()
         raise RuntimeError(f"Servidor nao respondeu /health em {timeout}s")
@@ -545,8 +547,8 @@ def preflight_llamaserver(gguf: str) -> tuple:
             try:
                 ur.urlopen("http://127.0.0.1:8080/health", timeout=2)
                 break
-            except Exception:
-                pass
+            except Exception as e:
+                except_pass("bench_orchestrator", "get_thermal_limit", str(e)[:60])
         else:
             return "FAIL", "servidor nao subiu"
 

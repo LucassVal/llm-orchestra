@@ -62,13 +62,16 @@ for bench_file in BUILD.glob("bench_*.py"):
 def check_skill_chain():
     """Verifica se skills estao presentes e em ordem."""
     skills_dir = Path.home() / ".hermes" / "skills" / "mlops"
-    if not skills_dir.exists():
-        return False, ["skills/mlops ausente"]
-
+    bench_skill = Path.home() / ".hermes" / "skills" / "bench-llm"
+    
     present = []
-    for d in sorted(skills_dir.iterdir()):
-        if d.is_dir() and (d / "SKILL.md").exists():
-            present.append(d.name)
+    if skills_dir.exists():
+        for d in sorted(skills_dir.iterdir()):
+            if d.is_dir() and (d / "SKILL.md").exists():
+                present.append(d.name)
+    # bench-llm vive fora de mlops/
+    if bench_skill.exists() and (bench_skill / "SKILL.md").exists():
+        present.append("bench-llm")
 
     missing = [s for s in SKILL_CHAIN if s not in present]
     return len(missing) == 0, missing

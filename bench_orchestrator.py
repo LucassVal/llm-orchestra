@@ -10,7 +10,7 @@ Fases:
   2. BENCHMARK: 10 perguntas × 2 métodos × reasoning ON/OFF
   3. RELATÓRIO: tabela PASS/FAIL + markdown + JSON
 
-Camadas: Domain → Application → Infrastructure → Presentation
+Camadas: Domain -> Application -> Infrastructure -> Presentation
 Regras: R-TRACE, R-NO-SILENT-FAIL, R-IDEMPOTENT, R-KISS, R-PYTHON-FIRST.
 """
 import json
@@ -222,9 +222,9 @@ def kill_stray():
 
 
 def cleanup_after_model(model_name: str = ""):
-    """Limpeza completa entre modelos: SIGKILL → ollama stop → drop_caches.
+    """Limpeza completa entre modelos: SIGKILL -> ollama stop -> drop_caches.
     
-    Ciclo: start → test → KILL → cleanup → verify → next.
+    Ciclo: start -> test -> KILL -> cleanup -> verify -> next.
     Garante que a RAM do modelo anterior foi liberada antes do próximo.
     """
     
@@ -393,7 +393,7 @@ class ProcessRegistry:
 
 
 def decay_shutdown(registry: ProcessRegistry, reason: str = ""):
-    """Desligamento graceful: children → server → ollama → fuser → drop_caches."""
+    """Desligamento graceful: children -> server -> ollama -> fuser -> drop_caches."""
     tag = f" [{reason}]" if reason else ""
     tee(f"🔄 DECAY SHUTDOWN iniciado{tag}")
     
@@ -637,7 +637,7 @@ def print_preflight_table(pf_list: list):
         def fmt(s, d):
             if not s:
                 return "N/A"
-            icon = {"PASS": "✓", "FAIL": "✗", "OOM": "💀", "SKIP": "→", "TIMEOUT": "⏰"}.get(s, "?")
+            icon = {"PASS": "✓", "FAIL": "✗", "OOM": "DEAD", "SKIP": "->", "TIMEOUT": "TIME"}.get(s, "?")
             return f"{icon} {s} ({d})"
         risk = "⚠ SWAP" if pf.get("risky") else ""
         print(f"  {pf['model_name']:<20} {fmt(pf['llamacpp_status'], pf['llamacpp_detail']):<15} "
@@ -723,7 +723,7 @@ def generate_markdown(all_results: list, run_id: str) -> str:
             tok_s = r.get("tok_s", "-")
             answer = (r.get("answer") or r.get("error") or "")[:60].replace("|", "\\|").replace("\n", " ")
 
-            icon = {"OK": "✅", "FAIL": "❌", "TIMEOUT": "⏰", "OOM": "💀", "SKIP": "→", "BLOCKED": "⛔"}.get(status, "❓")
+            icon = {"OK": "✅", "FAIL": "❌", "TIMEOUT": "TIME", "OOM": "DEAD", "SKIP": "->", "BLOCKED": "⛔"}.get(status, "❓")
 
             lines.append(f"| {i} | {method} | {reasoning} | {cat} | {icon} {status} | {time_s}s | {tok_s} | {answer} |")
 
@@ -744,8 +744,8 @@ def main():
     ap.add_argument("--reasoning", default="off", help="off | auto | off,auto")
     ap.add_argument("--quick", action="store_true", help="Apenas 3 perguntas rapidas (B1,L1,C1)")
     ap.add_argument("--ppl-only", action="store_true", help="Apenas perplexidade (PPL) em todos os modelos")
-    ap.add_argument("--pipeline", action="store_true", help="Pipeline completo: stress → battery → creative → ppl → analyze")
-    ap.add_argument("--stress", action="store_true", help="Stress test: cold → sustained → stress (3 fases)")
+    ap.add_argument("--pipeline", action="store_true", help="Pipeline completo: stress -> battery -> creative -> ppl -> analyze")
+    ap.add_argument("--stress", action="store_true", help="Stress test: cold -> sustained -> stress (3 fases)")
     ap.add_argument("--discover", action="store_true", help="Auto-descobre modelos via Ollama registry + GGUF files")
     ap.add_argument("--force", action="store_true", help="Forca execucao mesmo com outro orquestrador rodando")
     args = ap.parse_args()
@@ -998,7 +998,7 @@ def main():
                     tier = "full"
                     thermal_c = 0
                 if limit < 512:
-                    tee("  [THROTTLE] {} → tier={} max_tokens={} temp={}C".format(
+                    tee("  [THROTTLE] {} -> tier={} max_tokens={} temp={}C".format(
                         test_name, tier, limit, thermal_c))
                 model_result["thermal_log"].append({
                     "step": test_name, "tier": tier, "max_tokens": limit,
@@ -1094,7 +1094,7 @@ def main():
         from bench_sys import SysMonitor
         
         models.sort(key=lambda m: m.size_gb)
-        tee(f"STRESS TEST -- {len(models)} modelos (menor → maior)")
+        tee(f"STRESS TEST -- {len(models)} modelos (menor -> maior)")
         tee(f"LOG: {LOG_FILE}")
         
         monitor = SysMonitor()
@@ -1136,7 +1136,7 @@ def main():
                 while True:
                     time.sleep(10)
                     curr = max(monitor.snapshot()["thermal"].values()) if monitor.snapshot()["thermal"] else 0
-                    tee(f"    → {curr}°C")
+                    tee(f"    -> {curr}°C")
                     if curr < 65:
                         break
             

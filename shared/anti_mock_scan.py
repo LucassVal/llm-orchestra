@@ -83,7 +83,7 @@ def scan_file(filepath):
                             "type": "SILENT_EXCEPT",
                             "file": rel,
                             "line": node.lineno,
-                            "detail": "except Exception: pass puro — mascara falha sem fallback",
+                            "detail": "except Exception: pass puro -- mascara falha sem fallback",
                         })
 
     return findings

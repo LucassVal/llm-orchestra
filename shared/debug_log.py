@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # 3W: WHAT=debug logger centralizado | WHY=auditar except blocks | WHEN=todo except silencioso
 """
-debug_log.py — Logger centralizado para except blocks.
+debug_log.py -- Logger centralizado para except blocks.
 Substitui pass-puro por log.debug() mantendo comportamento.
 Nivel DEBUG so aparece se BENCH_DEBUG=1 no ambiente.
 """
@@ -28,5 +28,5 @@ def log(msg: str, level: str = "DEBUG"):
 
 def except_pass(module: str, func: str, error: str, detail: str = ""):
     """Substitui 'except Exception: pass' por log auditavel."""
-    msg = "{}:{} — {} — {}".format(module, func, error, detail) if detail else "{}:{} — {}".format(module, func, error)
+    msg = "{}:{} -- {} -- {}".format(module, func, error, detail) if detail else "{}:{} -- {}".format(module, func, error)
     log(msg, "EXCEPT")

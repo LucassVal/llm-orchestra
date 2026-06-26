@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # 3W: WHAT=tools runner | WHY=rodar smellcheck+vulture+deadcode | WHEN=pre-commit
 """
-tools_gate.py — Executa ferramentas externas de analise.
+tools_gate.py -- Executa ferramentas externas de analise.
 smellcheck (60 AST checks) + vulture (dead code) + deadcode (AST).
 Integrado ao pre_commit_hook como barreira adicional.
 """

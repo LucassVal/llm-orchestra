@@ -879,6 +879,12 @@ def main():
                         temps = []
                         for z in zones:
                             try:
+                                # Filtra hw-trip (valor fixo 105°C, nao sensor real)
+                                type_path = Path(str(z).replace("/temp", "/type"))
+                                if type_path.exists():
+                                    ztype = type_path.read_text().strip()
+                                    if "hw-trip" in ztype or "trip" in ztype.lower():
+                                        continue
                                 raw = int(z.read_text().strip())
                                 temps.append(raw / 1000.0)
                             except Exception:

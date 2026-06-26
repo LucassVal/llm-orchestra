@@ -3,6 +3,8 @@
 # DDD: orquestrador DONO do servidor, children clientes puros
 # SDD: sweep_config.json como spec canonica de parametros
 # Harness: ProcessRegistry + decay_shutdown preventivo
+
+.DEFAULT_GOAL := quick-test
 #
 # ORDEM CANONICA (enforced):
 #   1. CHECKPOINT: lint → deps → rules → audit → gate
@@ -92,6 +94,9 @@ kill-all: ## Mata processos orfaos (llama-server, bench, ollama) — ERR obrigat
 
 test: ## Roda todos os testes (pytest + smoke)
 	@cd $(BUILD) && pytest tests/ -v
+
+quick-test: checkpoint ## Teste rapido padrao — stress test 3 fases (~2min, thermal control)
+	@cd $(BUILD) && python3 bench_orchestrator.py --discover --stress --model Qwen_Qwen3-4B-Q4_K_M --timeout 300
 
 install: checkpoint ## Setup automatizado do ecossistema
 	@echo "=== INSTALL: LLM-Orchestra ==="

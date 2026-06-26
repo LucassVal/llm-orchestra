@@ -53,6 +53,7 @@ switch ($Command) {
     "clean" { clean }
     "kill-all" { kill-all }
     "test" { test }
+    "quick-test" { quick-test }
     "install" { install }
     "audit" { audit }
     "lint" { lint }

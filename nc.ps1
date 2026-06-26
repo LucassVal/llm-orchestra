@@ -46,9 +46,12 @@ function daemon-start { Push-Location $BUILD; python meta_orchestrator.py --daem
 function daemon-stop { Push-Location $BUILD; python meta_orchestrator.py --daemon stop; Pop-Location }
 function daemon-status { Push-Location $BUILD; python meta_orchestrator.py --daemon status; Pop-Location }
 
+function kill-all { Push-Location $BUILD; python shared/kill_all.py; Pop-Location }
+
 switch ($Command) {
     "boot" { boot }
     "clean" { clean }
+    "kill-all" { kill-all }
     "test" { test }
     "install" { install }
     "audit" { audit }

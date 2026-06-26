@@ -116,12 +116,58 @@ def run_audit():
     return r.returncode == 0, r.stdout
 
 
+def run_kill_all():
+    """Mata processos orfaos (ERR obrigatorio, sempre roda ao commitar)."""
+    sys.path.insert(0, str(BUILD))
+    r = subprocess.run(
+        [sys.executable, str(BUILD/"shared"/"kill_all.py")],
+        capture_output=True, text=True, cwd=str(BUILD),
+    )
+    return r.returncode == 0, r.stdout
+
+
+def run_rich_check():
+    """Verifica se rich e display estao funcionais (ERR obrigatorio)."""
+    sys.path.insert(0, str(BUILD))
+    try:
+        import rich  # noqa: F401
+        import shared.display  # noqa: F401
+        from shared.display import panel, thermal_gauge
+        panel("RICH CHECK", "display funcional")
+        thermal_gauge(50.0, "full", 512)
+        return True, "rich+display OK"
+    except ImportError as e:
+        return False, "RICH ausente: {}".format(e)
+    except Exception as e:
+        return False, "RICH quebrado: {}".format(e)
+
+
 def main():
     findings = scan_stubs()
+    kill_ok, kill_out = run_kill_all()
+    rich_ok, rich_msg = run_rich_check()
     slop_ok, slop_out, slop_issues = run_slop()
     mock_ok, mock_out = run_mock_tests()
     rules_ok, rules_out = run_rules()
     audit_ok, audit_out = run_audit()
+
+    # ── KILL-ALL (ERR obrigatorio) ──
+    print("=" * 70)
+    print("  KILL-ALL — Processos orfaos")
+    print("=" * 70)
+    print(kill_out)
+    print()
+
+    # ── RICH CHECK (ERR obrigatorio) ──
+    if not rich_ok:
+        print("=" * 70)
+        print("  RICH CHECK -- FAIL (ERR bloqueante)")
+        print("=" * 70)
+        print("  {}".format(rich_msg))
+        print("=" * 70)
+        print()
+    else:
+        print("RICH CHECK: {}".format(rich_msg))
 
     # ── COMPLIANCE (visao geral do sistema) ──
     print("=" * 70)
@@ -178,10 +224,10 @@ def main():
 
     # ── Compliance (ja exibido acima como visao geral) ──
     # ── GATE (ALL ERR) ──
-    has_issues = bool(findings) or not slop_ok or not mock_ok or not rules_ok or not audit_ok
+    has_issues = bool(findings) or not slop_ok or not mock_ok or not rules_ok or not audit_ok or not kill_ok or not rich_ok
 
     if not has_issues:
-        print("✓ GATE: limpo (stubs=0, slop=ok, mock=ok, rules=ok, audit=PASS). Commit liberado.")
+        print("✓ GATE: limpo (kill=ok, rich=ok, stubs=0, slop=ok, mock=ok, rules=ok, audit=PASS). Commit liberado.")
         return 0
 
     if NO_BYPASS:

@@ -31,7 +31,7 @@ export OLLAMA_CONTEXT_LENGTH
 # CHECKPOINT — obrigatorio antes de qualquer acao
 # ═══════════════════════════════════════════════════════════════
 
-checkpoint: ollama lint deps rules audit seal validate antimock tools
+checkpoint: kill-all ollama lint deps rules audit seal validate antimock tools
 	@echo ""
 	@echo "✓ CHECKPOINT: ollama + lint + deps + rules + audit + seal + validate + antimock + tools — todos PASS"
 	@echo ""
@@ -86,6 +86,9 @@ boot: checkpoint ## Health check completo (checkpoint + overview)
 
 clean: ## Limpa logs, cache, temp
 	@cd $(BUILD) && rm -rf logs/*.log __pycache__ */__pycache__ .pytest_cache && echo "limpo"
+
+kill-all: ## Mata processos orfaos (llama-server, bench, ollama) — ERR obrigatorio
+	@cd $(BUILD) && python3 shared/kill_all.py
 
 test: ## Roda todos os testes (pytest + smoke)
 	@cd $(BUILD) && pytest tests/ -v

@@ -37,15 +37,25 @@ SEALED = [
     "shared/thermal_governor.py", "shared/metrics_daemon.py",
     "shared/metrics_reporter.py", "shared/agent_factory.py",
     "shared/multi_agent.py",
+    "shared/system_validate.py", "shared/anti_mock_scan.py",
+    "shared/seal_check.py",
+    "shared/factory_engine.py", "shared/display.py",
+    "shared/dispatch_log.py", "shared/kill_all.py",
     # Per-model
     "test-4b/orchestrator.py", "test-coder/orchestrator.py",
     "test-gemma/orchestrator.py",
     "test-4b/sweep_config.json", "test-coder/sweep_config.json",
     "test-gemma/sweep_config.json",
     # Agents
+    "../agents/agent_contract_template.json",
+    # Templates (fabrica AST)
+    "templates/agent_module.py.jinja",
+    "templates/profile.json.jinja",
+    "templates/test_bench.py.jinja",
+    "templates/partials/agent_init.py.jinja",
+    "templates/partials/agent_run.py.jinja",
     # Logs (append-only, audit trail)
     "logs/bench_run.log",
-    "../agents/agent_contract_template.json",
 ]
 
 

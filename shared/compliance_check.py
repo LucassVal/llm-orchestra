@@ -70,6 +70,11 @@ def run():
     env_ok = (BUILD/".env.make").exists() and (BUILD/".env").exists()
     system["env"] = {"status": "PASS" if env_ok else "FAIL", "detail": "ambos" if env_ok else "faltando"}
 
+    # Kill-all (protecao contra processos zumbi)
+    kf = BUILD / "shared" / "kill_all.py"
+    system["kill_all"] = {"status": "PASS" if kf.exists() else "FAIL",
+                          "detail": "presente" if kf.exists() else "ausente"}
+
     results["SYSTEM"] = system
 
     # ═══════════════════════════════════════════════════════

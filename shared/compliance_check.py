@@ -198,6 +198,11 @@ def run():
     test_files = list((BUILD/"tests").glob("test_*.py")) if (BUILD/"tests").exists() else []
     arch["tests"] = {"status": "PASS" if len(test_files) >= 1 else "WARN", "detail": "{} files".format(len(test_files))}
 
+    # Dispatch log
+    dispatch_dir = BUILD / "logs" / "dispatch"
+    dispatch_files = list(dispatch_dir.glob("*.json")) if dispatch_dir.exists() else []
+    arch["dispatch"] = {"status": "PASS" if dispatch_dir.exists() else "WARN", "detail": "{} disparos".format(len(dispatch_files))}
+
     results["ARCHITECTURE"] = arch
 
     # ═══════════════════════════════════════════════════════

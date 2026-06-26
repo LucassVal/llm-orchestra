@@ -87,15 +87,32 @@ THERMAL_FILE = os.path.join(BUILD, "shared", "thermal_status.json")
 
 
 def get_thermal_limit(default_max_tokens=512):
-    """Le o governador termico e retorna max_tokens ajustado.
-    Power-throttle: reduz tokens com temperatura, nunca bloqueia."""
+    """Le sensores termicos REAIS e retorna max_tokens ajustado.
+    Power-throttle: reduz tokens com temperatura, nunca bloqueia.
+    Lê /sys/class/thermal/ diretamente — NUNCA cache antigo."""
     try:
-        import json
-        with open(THERMAL_FILE) as f:
-            d = json.load(f)
-        tier = d.get("tier", "full")
-        limits = {"full": 512, "eco": 256, "low": 128, "minimal": 64, "idle": 16}
-        return limits.get(tier, default_max_tokens)
+        # Lê temperaturas reais dos sensores
+        temps = []
+        import glob
+        for zone in glob.glob("/sys/class/thermal/thermal_zone*/temp"):
+            try:
+                with open(zone) as f:
+                    temps.append(int(f.read().strip()) / 1000.0)
+            except Exception:
+                pass
+        if not temps:
+            return default_max_tokens
+        thermal_c = max(temps)
+        # Tier por temperatura REAL
+        if thermal_c > 90:
+            return 16   # idle
+        elif thermal_c > 85:
+            return 64   # minimal
+        elif thermal_c > 80:
+            return 128  # low
+        elif thermal_c > 70:
+            return 256  # eco
+        return default_max_tokens  # full
     except Exception:
         return default_max_tokens
 

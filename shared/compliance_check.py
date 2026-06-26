@@ -164,8 +164,8 @@ def run():
                 for other in child_dirs:
                     if other != child and other in content:
                         ddd_violations += 1
-            except Exception:
-                pass
+            except Exception as e:
+                except_pass("compliance_check", "profile_parse", str(e)[:60])
     arch["ddd"] = {"status": "PASS" if ddd_violations == 0 else "FAIL", "detail": "{} violacoes".format(ddd_violations)}
 
     # Orphans

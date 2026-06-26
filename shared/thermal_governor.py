@@ -67,10 +67,11 @@ class ThermalGovernor:
                 try:
                     raw = int(z.read_text().strip())
                     temps.append(raw / 1000.0)
-                except Exception:
-                    pass
+                except Exception as e:
+                    except_pass("thermal_governor", "sensor_read", str(e)[:60])
             return max(temps) if temps else 0
-        except Exception:
+        except Exception as e:
+            except_pass("thermal_governor", "thermal_read", str(e)[:60])
             return 0
 
     def _read_ram(self):

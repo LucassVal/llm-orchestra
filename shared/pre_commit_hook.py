@@ -92,9 +92,8 @@ def run_slop():
 def run_mock_tests():
     """Roda pytest com mock -- testes unitarios."""
     r = subprocess.run(
-        ["pytest", str(BUILD/"tests"), "-q", "--tb=short", "--rootdir", str(BUILD)],
-        capture_output=True, text=True,
-        cwd=str(BUILD),
+        [sys.executable, "-m", "pytest", str(BUILD/"tests"), "-q", "--tb=short", "-o", "rootdir=" + str(BUILD)],
+        capture_output=True, text=True, cwd=str(BUILD),
     )
     return r.returncode == 0, r.stdout
 

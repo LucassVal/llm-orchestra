@@ -368,3 +368,17 @@ Antes de qualquer pipeline:
 - [ ] `make daemon-status` → rodando
 - [ ] `free -h` → >2GB disponivel
 - [ ] `cat shared/thermal_status.json | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['thermal_c'])"` → <90°C
+
+## R-BENCH-LOG — Auditoria de Logs
+
+Todo except block deve ter fallback ou log.
+Ferramenta: BENCH_DEBUG=1 ativa logs/debug.log.
+Sub-regra: R-NO-SILENT-FAIL (nunca return False/None sem stderr).
+
+## R-BENCH-TOOLS — Ferramentas Externas
+
+Checkpoint inclui ferramentas maduras da comunidade:
+- smellcheck: 60 AST checks (zero deps)
+- vulture: dead code detection (3.8k estrelas)
+- deadcode: AST-based dead code
+Comando: make tools

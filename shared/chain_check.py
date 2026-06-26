@@ -61,7 +61,6 @@ for bench_file in BUILD.glob("bench_*.py"):
 
 def check_skill_chain():
     """Verifica se skills estao presentes e em ordem."""
-    import json
     skills_dir = Path.home() / ".hermes" / "skills" / "mlops"
     if not skills_dir.exists():
         return False, ["skills/mlops ausente"]
@@ -97,8 +96,7 @@ def check_ddd_chain():
                 if isinstance(node, ast.Import):
                     for alias in node.names:
                         imports.append(alias.name)
-                elif isinstance(node, ast.ImportFrom):
-                    if node.module:
+                elif isinstance(node, ast.ImportFrom) and node.module:
                         imports.append(node.module)
             # LEVEL 2 (bench_*.py) nao pode importar meta_orchestrator
             for imp in imports:

@@ -10,7 +10,6 @@ import os
 import signal
 import subprocess
 import sys
-from pathlib import Path
 
 
 def find_and_kill():
@@ -47,9 +46,8 @@ def find_and_kill():
             for pattern in patterns:
                 if pattern in cmdline and "grep" not in cmdline and "kill_all" not in cmdline:
                     # Protege ollama serve legitimo (porta 11434)
-                    if pattern == "llama-server" and "--port" in cmdline:
-                        if "8080" not in cmdline:
-                            continue  # Nao mata llama-server do ollama
+                    if pattern == "llama-server" and "--port" in cmdline and "8080" not in cmdline:
+                        continue  # Nao mata llama-server do ollama
                     pid = int(parts[1])
                     try:
                         os.kill(pid, signal.SIGKILL)

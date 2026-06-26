@@ -375,6 +375,15 @@ Todo except block deve ter fallback ou log.
 Ferramenta: BENCH_DEBUG=1 ativa logs/debug.log.
 Sub-regra: R-NO-SILENT-FAIL (nunca return False/None sem stderr).
 
+## R-BENCH-CHAIN -- Cadeia de Skills e Workflows
+
+Skills e workflows devem seguir ordem canonica. Nenhum bypass de nivel DDD.
+- Skills: bench-llm -> agent-workflow -> compliance-audit -> dev-workflow -> python-audit
+- Workflow: kill-all -> ollama -> lint -> deps -> rules -> audit -> chain -> seal -> validate -> gate
+- DDD: LEVEL 2 (bench_*.py) nunca importa LEVEL 0 (meta_orchestrator)
+- Chain break = ERR bloqueante
+Ferramenta: `chain_check.py` (3 verificacoes: skills, workflow, DDD).
+
 ## R-BENCH-TOOLS — Ferramentas Externas
 
 Checkpoint inclui ferramentas maduras da comunidade:

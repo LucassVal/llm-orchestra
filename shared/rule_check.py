@@ -273,6 +273,18 @@ def check_progress():
     return True, "todas com barra"
 
 
+def check_chain():
+    """Skills e workflows em cadeia canonica (ERR — R-BENCH-CHAIN)"""
+    import subprocess
+    r = subprocess.run(
+        [sys.executable, str(BUILD/"shared"/"chain_check.py")],
+        capture_output=True, text=True, cwd=str(BUILD),
+    )
+    ok = r.returncode == 0
+    detail = r.stdout.strip().split("\n")[-1][:50] if r.stdout else "?"
+    return ok, detail
+
+
 def check_audit():
     """Logs imutaveis -- nunca "w" em arquivo de log (ERR)"""
     violations = []
@@ -308,6 +320,7 @@ CHECKS = [
     ("R-ORCHESTRATOR",    check_orchestrator),
     ("R-SDD",             check_sdd),
     ("R-PROGRESS",        check_progress),
+    ("R-CHAIN",           check_chain),
 ]
 
 

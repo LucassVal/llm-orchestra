@@ -131,6 +131,14 @@ def run():
     slop_count = len([line for line in r.stdout.split("\n") if line.strip()])
     code["slop"] = {"status": "PASS" if slop_count == 0 else "FAIL", "detail": "{} slops".format(slop_count)}
 
+    # Chain check (skills/workflows em ordem canonica)
+    r = subprocess.run(
+        [sys.executable, str(BUILD/"shared"/"chain_check.py")],
+        capture_output=True, text=True,
+    )
+    code["chain"] = {"status": "PASS" if r.returncode == 0 else "FAIL",
+                      "detail": r.stdout.strip().split(chr(92)+'n')[-1][:50]}
+
     results["CODE"] = code
 
     # ═══════════════════════════════════════════════════════

@@ -40,11 +40,13 @@ WORKFLOW_CHAIN = [
 ]
 
 # Hierarquia DDD (quem pode chamar quem)
-# LEVEL 0: meta_orchestrator.py → pode chamar LEVEL 1
-# LEVEL 1: test-*/orchestrator.py, shared/* → pode chamar LEVEL 2
-# LEVEL 2: bench_*.py → leaf, nao chama ninguem acima
+# LEVEL 0: meta_orchestrator.py — hub, pode chamar LEVEL 1 e LEVEL 1.5
+# LEVEL 1: test-*/orchestrator.py, shared/* — podem chamar LEVEL 1.5 e LEVEL 2
+# LEVEL 1.5: bench_orchestrator.py — motor compartilhado, pode usar shared
+# LEVEL 2: bench_*.py (exceto bench_orchestrator) — leaf, nao importa nada acima
 DDD_CHAIN = {
     "meta_orchestrator.py": 0,
+    "bench_orchestrator.py": 1.5,  # motor engine, pode usar shared
 }
 
 for model in ["test-4b", "test-coder", "test-gemma"]:
@@ -56,7 +58,8 @@ for shared_file in BUILD.glob("shared/*.py"):
         DDD_CHAIN[rel] = 1
 
 for bench_file in BUILD.glob("bench_*.py"):
-    DDD_CHAIN[bench_file.name] = 2
+    if bench_file.name != "bench_orchestrator.py":
+        DDD_CHAIN[bench_file.name] = 2
 
 
 def check_skill_chain():
@@ -88,31 +91,59 @@ def check_workflow_chain():
 
 
 def check_ddd_chain():
-    """Verifica se nenhum arquivo LEVEL 2 importa LEVEL 0 ou LEVEL 1 (chain break)."""
+    """Verifica hierarquia DDD — chain breaks sao ERR bloqueantes."""
     violations = []
+    
+    # LEVEL 2 (bench_*.py exceto bench_orchestrator): nao pode importar shared nem meta
     for py_file in BUILD.glob("bench_*.py"):
+        if py_file.name == "bench_orchestrator.py":
+            continue  # LEVEL 1.5 — pode usar shared
         try:
-            content = py_file.read_text()
-            tree = ast.parse(content)
-            imports = []
+            tree = ast.parse(py_file.read_text())
             for node in ast.walk(tree):
+                if isinstance(node, ast.ImportFrom) and node.module:
+                    if node.module.startswith("shared"):
+                        violations.append(
+                            f"{py_file.name}: importa shared ({node.module}) — LEVEL 2 nao pode importar LEVEL 1"
+                        )
                 if isinstance(node, ast.Import):
                     for alias in node.names:
-                        imports.append(alias.name)
-                elif isinstance(node, ast.ImportFrom) and node.module:
-                        imports.append(node.module)
-            # LEVEL 2 (bench_*.py) nao pode importar meta_orchestrator
-            for imp in imports:
-                if "meta_orchestrator" in imp:
-                    violations.append(
-                        f"{py_file.name}: importa 'meta_orchestrator' (LEVEL 2→0 quebra cadeia)"
-                    )
-                if "orchestrator" in imp and "bench_orchestrator" not in imp and "test-" not in imp:
-                    violations.append(
-                        f"{py_file.name}: importa '{imp}' (chain break suspeito)"
-                    )
+                        if alias.name == "shared":
+                            violations.append(
+                                f"{py_file.name}: import shared — LEVEL 2 nao pode importar LEVEL 1"
+                            )
         except Exception:
             pass
+
+    # LEVEL 1 orchestrators: nao podem importar meta_orchestrator
+    for model_dir in ["test-4b", "test-coder", "test-gemma"]:
+        orch = BUILD / model_dir / "orchestrator.py"
+        if orch.exists():
+            try:
+                tree = ast.parse(orch.read_text())
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.ImportFrom) and node.module:
+                        if "meta_orchestrator" in node.module:
+                            violations.append(
+                                f"{model_dir}/orchestrator.py: importa meta_orchestrator — LEVEL 1 nao pode importar LEVEL 0"
+                            )
+            except Exception:
+                pass
+
+    # Cross-child: test-4b nao referencia test-coder ou test-gemma
+    for child in ["test-4b", "test-coder", "test-gemma"]:
+        others = [d for d in ["test-4b", "test-coder", "test-gemma"] if d != child]
+        for py_file in (BUILD / child).glob("*.py"):
+            try:
+                content = py_file.read_text()
+                for other in others:
+                    if other in content:
+                        violations.append(
+                            f"{child}/{py_file.name}: referencia {other} — cross-child quebra DDD"
+                        )
+            except Exception:
+                pass
+
     return len(violations) == 0, violations
 
 

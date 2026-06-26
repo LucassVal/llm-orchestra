@@ -29,5 +29,5 @@ def test_ollama_models():
     import subprocess
     r = subprocess.run(['ollama', 'list'], capture_output=True, text=True)
     assert r.returncode == 0
-    models = [l for l in r.stdout.split('\n') if l.strip()][1:]
+    models = [line for line in r.stdout.split("\n") if line.strip()][1:]
     assert len(models) >= 3

@@ -9,6 +9,7 @@ Usa llama-server recompilado. Output JSON via stdout.
 import argparse
 import json
 import os
+import sys
 import urllib.request
 
 from bench_sys import SysMonitor

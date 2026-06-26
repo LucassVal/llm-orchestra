@@ -23,6 +23,7 @@ def tee(msg: str):
     print(f"  [{datetime.now().strftime('%H:%M:%S')}] {msg}", flush=True)
 
 
+# TODO(a8): reduzir 9 params → dataclass/config dict
 def run_test(gguf: str, prompt: str, max_tokens: int, threads: int,
              batch_size: int, ctx_size: int, flash_attn: bool,
              ngl: int, mlock: bool, timeout: int = 120) -> dict:

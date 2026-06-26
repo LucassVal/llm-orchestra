@@ -1,25 +1,33 @@
 import sys
 from pathlib import Path
-
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 
-def test_import_thermal():
+def test_thermal_governor():
     from shared import thermal_governor
-    assert thermal_governor is not None
+    gov = thermal_governor.get_governor()
+    assert gov is not None
+    assert hasattr(gov, 'should_throttle')
 
 
-def test_import_dispatch():
+def test_dispatch_log():
     from shared import dispatch_log
-    assert dispatch_log is not None
+    dh = dispatch_log.create('test-agent', 'mock-test', model='4b')
+    assert len(dh) == 16  # hash hex
+    dispatch_log.complete(dh, 'OK', tok_s=10.5)
 
 
-def test_import_circularity():
-    from shared import circularity_check
-    assert circularity_check is not None
+def test_pipeline_status():
+    import json
+    status_file = Path(__file__).parent.parent / 'bench_status.json'
+    assert status_file.exists()
+    d = json.loads(status_file.read_text())
+    assert 'phase' in d
 
 
-def test_py_check_self():
-    from shared import py_check
-    result = py_check.check_file(Path(__file__).parent.parent / "shared" / "dispatch_log.py")
-    assert result[0] is True  # (bool, error_msg)
+def test_ollama_models():
+    import subprocess
+    r = subprocess.run(['ollama', 'list'], capture_output=True, text=True)
+    assert r.returncode == 0
+    models = [l for l in r.stdout.split('\n') if l.strip()][1:]
+    assert len(models) >= 3

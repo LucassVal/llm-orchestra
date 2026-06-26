@@ -733,6 +733,7 @@ def generate_markdown(all_results: list, run_id: str) -> str:
 
 # ═══════════════════════════════════════════════════════════════════
 # MAIN
+# TODO(a7): dividir main() 567 linhas em sub-funcoes (discover, pipeline, stress, etc.)
 # ═══════════════════════════════════════════════════════════════════
 
 def main():

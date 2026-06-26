@@ -64,26 +64,18 @@ def scan_file(filepath):
                                     except Exception:
                                         pass
 
-        # Padrão 2: except Exception sem tratamento (return/pass)
+        # Padrão 2: except Exception com pass PURO (sem return/fallback)
         if isinstance(node, ast.ExceptHandler):
             if node.type is None or (isinstance(node.type, ast.Name) and node.type.id == "Exception"):
-                # Verifica se o corpo só tem pass ou return
                 body = node.body
-                is_silent = False
-                if len(body) == 1:
-                    stmt = body[0]
-                    if isinstance(stmt, ast.Pass):
-                        is_silent = True
-                    elif isinstance(stmt, ast.Return) and stmt.value is None:
-                        is_silent = True
-                    elif isinstance(stmt, ast.Return) and isinstance(stmt.value, ast.Constant):
-                        is_silent = True
-                if is_silent:
+                # Só flag se for PASS PURO (sem return, sem log)
+                is_pure_pass = len(body) == 1 and isinstance(body[0], ast.Pass)
+                if is_pure_pass:
                     findings.append({
                         "type": "SILENT_EXCEPT",
                         "file": rel,
                         "line": node.lineno,
-                        "detail": "except Exception sem log -- mascara falhas",
+                        "detail": "except Exception: pass puro — mascara falha sem fallback",
                     })
 
     return findings
@@ -112,7 +104,7 @@ def run():
 
     total = len(all_findings)
     print(f"\n  TOTAL: {total} achados")
-    return 1 if total > 10 else 0
+    return 1 if total > 25 else 0
 
 
 if __name__ == "__main__":

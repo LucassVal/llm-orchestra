@@ -103,7 +103,7 @@ def run_rules():
     """Roda rule_check.py -- todas regras R-BENCH-*."""
     r = subprocess.run(
         [sys.executable, str(BUILD/"shared"/"rule_check.py")],
-        capture_output=True, text=True,
+        capture_output=True, text=True, cwd=str(BUILD),
     )
     return r.returncode == 0, r.stdout
 
@@ -112,7 +112,7 @@ def run_audit():
     """Roda compliance_check.py e retorna (passed, output)."""
     r = subprocess.run(
         [sys.executable, str(BUILD/"shared"/"compliance_check.py")],
-        capture_output=True, text=True,
+        capture_output=True, text=True, cwd=str(BUILD),
     )
     return r.returncode == 0, r.stdout
 

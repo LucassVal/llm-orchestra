@@ -80,6 +80,20 @@ BLOBS_DIR    = os.path.expanduser("~/.ollama/models/blobs")
 LOG_FILE     = os.path.join(BUILD, "logs", "bench_run.log")
 STATUS_FILE  = os.path.join(BUILD, "bench_status.json")
 RESULTS_FILE = os.path.join(BUILD, "benchmark_final.json")
+THERMAL_FILE = os.path.join(BUILD, "shared", "thermal_status.json")
+
+
+def get_thermal_limit(default_max_tokens=512):
+    """Le o governador termico e retorna max_tokens ajustado.
+    Power-throttle: reduz tokens com temperatura, nunca bloqueia."""
+    try:
+        import json
+        d = json.loads(open(THERMAL_FILE).read())
+        tier = d.get("tier", "full")
+        limits = {"full": 512, "eco": 256, "low": 128, "minimal": 64, "idle": 16}
+        return limits.get(tier, default_max_tokens)
+    except Exception:
+        return default_max_tokens
 
 _status_state = {"run_id": "", "phase": "idle", "model": "", "step": "",
                  "step_n": 0, "step_total": 0, "elapsed_s": 0, "updated": ""}
@@ -427,8 +441,8 @@ def check_memory_pressure(threshold_mb: int = 800) -> bool:
 
 def run_pipeline_child(child_script: str, args: list, label: str,
                         registry: ProcessRegistry = None,
-                        timeout: int = 300) -> dict:
-    """Executa child com proteção OOM. Se pressão detectada, faz decay preventivo."""
+                        timeout: int = 300, env: dict = None) -> dict:
+    """Executa child com proteção OOM + power-throttle termico."""
     if check_memory_pressure(800):
         tee(f"  ⛔ OOM preventivo antes de {label}")
         if registry:
@@ -437,7 +451,7 @@ def run_pipeline_child(child_script: str, args: list, label: str,
     
     tee(f"  [PIPELINE] {label}...")
     try:
-        r = subprocess.run(args, capture_output=True, text=True, timeout=timeout)
+        r = subprocess.run(args, capture_output=True, text=True, timeout=timeout, env=env)
         if r.stderr:
             for line in r.stderr.strip().split("\n"):
                 if line.strip():
@@ -928,10 +942,16 @@ def main():
             
             for test_name, script, test_args, timeout in TESTS:
                 step_n = i * len(TESTS) + list(dict(TESTS).keys()).index(test_name) + 1
+                # Power-throttle: governador termico reduz tokens se necessario
+                limit = get_thermal_limit()
+                if limit < 512:
+                    tee("  [THROTTLE] {} → max_tokens={}".format(test_name, limit))
+                test_env = os.environ.copy()
+                test_env["BENCH_MAX_TOKENS"] = str(limit)
                 write_status(model=m.name, step=test_name, step_n=step_n, step_total=len(models)*len(TESTS),
                        elapsed_s=int(time.time() - pipeline_start))
                 result = run_pipeline_child(script, test_args, test_name,
-                                            registry, timeout)
+                                            registry, timeout, env=test_env)
                 model_result["tests"][test_name] = result
                 
                 if result.get("status") == "OOM_PROTECT":

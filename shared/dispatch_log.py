@@ -7,7 +7,6 @@ Formato canonico para auditoria e serie temporal.
 """
 import hashlib
 import json
-import time
 import uuid
 from datetime import datetime
 from pathlib import Path

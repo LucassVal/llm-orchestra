@@ -14,10 +14,6 @@ Camadas: Domain → Application → Infrastructure → Presentation
 Regras: R-TRACE, R-NO-SILENT-FAIL, R-IDEMPOTENT, R-KISS, R-PYTHON-FIRST.
 """
 import json
-from shared.dispatch_log import create as dispatch_create
-from shared.dispatch_log import complete as dispatch_complete
-from shared.dispatch_log import fail as dispatch_fail
-
 import os
 import signal as _signal
 import subprocess
@@ -29,6 +25,9 @@ from contextlib import suppress
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
+
+from shared.dispatch_log import complete as dispatch_complete
+from shared.dispatch_log import create as dispatch_create
 
 # ═══════════════════════════════════════════════════════════════════
 # DOMAIN

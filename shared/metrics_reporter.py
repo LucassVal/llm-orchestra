@@ -76,16 +76,21 @@ def collect_metrics():
         if data:
             for r in data.get("results", []):
                 t = r.get("tests", {})
+                battery = t.get("battery", {})
+                stress = t.get("stress", {})
                 models_metrics[test_dir] = {
                     "model": r.get("model", test_dir),
                     "gb": r.get("gb", 0),
-                    "stress": t.get("stress", {}).get("status", "?"),
-                    "battery": t.get("battery", {}).get("status", "?"),
+                    "stress": stress.get("status", "?"),
+                    "battery": battery.get("status", "?"),
+                    "battery_tok_s": battery.get("summary", {}).get("avg_tok_s", "?"),
+                    "battery_score": battery.get("summary", {}).get("score", "?"),
                     "creative": t.get("creative", {}).get("status", "?"),
                     "temp_sweep": t.get("temp_sweep", {}).get("status", "?"),
                     "sweep": t.get("sweep", {}).get("status", "?"),
                     "ppl": t.get("ppl", {}).get("ppl", "?"),
                     "analyze": t.get("analyze", {}).get("status", "?"),
+                    "thermal_log": r.get("thermal_log", []),
                 }
         else:
             models_metrics[test_dir] = {"model": test_dir, "status": "pending"}

@@ -34,3 +34,4 @@ llama.cpp/
 .smellcheck-cache/
 benchmark_pipeline.json
 *.gguf
+*.gguf
